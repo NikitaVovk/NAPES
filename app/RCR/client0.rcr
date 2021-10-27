@@ -1,0 +1,1 @@
+{client[3];105;{E;[{TokenIn;i;app/token2to3},{TokenOut;o;app/token3toS},{Local;l;1}]};{S;{fsm1;[{Low;[tokenIn,TokenOut];;{TokenIn;High}},{High;Local;;{Local;Low;TokenOut}}];Low}};{F;[{f1;{simple;500ms;100}},{f2;{simple;4s;256}}]};{P;[{port1;c;U;{;8004};{127.0.0.1;8000};fsm1;{Low;f1}},{port2;c;U;{;8004};{127.0.0.1;8000};fsm1;[{Low;f1},{High;f2}]}]};{M;{127.0.0.1;1883}}}

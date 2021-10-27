@@ -13,7 +13,7 @@ public class FlowParser extends PayLoadParser{
     public FlowParser(LinkedList<String> linkedList) {
         super(linkedList);
     }
-    public FlowList parseFlowList(){
+    public FlowList parseFlowList(boolean isAnonymous){
         FlowList flowList = new FlowList();
         char till='0';
         if (linkedList.get(1).equals("["))
@@ -23,7 +23,11 @@ public class FlowParser extends PayLoadParser{
         while (!linkedList.getFirst().equals(String.valueOf(till))&&
                 !linkedList.get(1).equals(String.valueOf(till))){
 
-            flowList.getFlows().add(parseFlow());
+            if (isAnonymous)
+                flowList.getFlows().add(parseAnonFlow());
+            else
+                flowList.getFlows().add(parseFlow());
+
 
         }
         return flowList;
@@ -34,6 +38,16 @@ public class FlowParser extends PayLoadParser{
     public Flow parseFlow(){
         Flow flow = new Flow();
         flow.setfName(readTillTo('{',';'));
+        flow.setfType(readTillTo('{',';'));
+        divideParamUnit(flow,readTillTo(';',';'));
+        flow.setfParametr(Integer.parseInt(readTillTo(';','}')));
+        linkedList.pop();
+        return flow;
+
+    }
+    public  Flow parseAnonFlow(){
+        Flow flow = new Flow();
+
         flow.setfType(readTillTo('{',';'));
         divideParamUnit(flow,readTillTo(';',';'));
         flow.setfParametr(Integer.parseInt(readTillTo(';','}')));

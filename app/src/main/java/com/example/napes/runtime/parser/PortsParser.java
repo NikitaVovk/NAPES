@@ -13,9 +13,13 @@ import java.util.LinkedList;
 
 public class PortsParser  extends PayLoadParser{
 
+    private FlowParser flowParser;
+
     public PortsParser(LinkedList<String> linkedList) {
         super(linkedList);
+        flowParser = new FlowParser(linkedList);
     }
+
     public PortList parsePortList(){
         PortList portList = new PortList();
         char till='0';
@@ -80,12 +84,20 @@ public class PortsParser  extends PayLoadParser{
         return stateFlowList;
 
     }
-    public StateFlow parseStateFlow(){
+    public  StateFlow parseStateFlow(){
         StateFlow stateFlow = new StateFlow();
         stateFlow.setsName(readTillTo('{',';'));
-        stateFlow.setfName(readTillTo(';','}'));
-        //linkedList.pop();
-        linkedList.pop();
+
+        if (linkedList.get(1).equals("{")||
+                linkedList.get(1).equals("[")){
+            stateFlow.setFlow(flowParser.parseFlowList(true));
+
+        }
+        else {
+            stateFlow.setfName(readTillTo(';', '}'));
+            //linkedList.pop();
+            linkedList.pop();
+        }
         return stateFlow;
 
     }

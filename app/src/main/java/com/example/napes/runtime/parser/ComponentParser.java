@@ -36,7 +36,7 @@ public class ComponentParser extends PayLoadParser {
 
 
         component.setStateMachineList(stateMachineParser.parseStateMachineList());
-        readTillTo('{',';');
+       // readTillTo('{',';');
         System.out.println(component.getStateMachineList());
 
         if (!readTillTo(';',';').equals("")){

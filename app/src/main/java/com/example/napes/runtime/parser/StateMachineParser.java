@@ -48,9 +48,9 @@ public class StateMachineParser  extends PayLoadParser{
             till='}';
         while (!linkedList.getFirst().equals(String.valueOf(till))&&
                 !linkedList.get(1).equals(String.valueOf(till))){
-
-            stateList.getStates().add(parseState());
             linkedList.pop();
+            stateList.getStates().add(parseState());
+
 
         }
         return stateList;

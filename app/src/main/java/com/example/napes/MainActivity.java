@@ -71,9 +71,9 @@ public class MainActivity extends AppCompatActivity  {
     public void addListenerOnButton(){
         System.out.println("COMING ON MAIN");
         settingButton = (Button) findViewById(R.id.settingButton);
-        radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+       // radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
 
-        messageText = findViewById(R.id.messageText);
+      //  messageText = findViewById(R.id.messageText);
         sendButton = findViewById(R.id.sendButton);
 
 
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity  {
     private void performFileSearch(){
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("text/*");
+        intent.setType("*/*");
 
 
         startActivityForResult(intent, READ_REQUEST_CODE);

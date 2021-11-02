@@ -1,5 +1,6 @@
 package com.example.napes.clients;
 
+import android.graphics.Color;
 import android.os.Message;
 
 import com.example.napes.MainActivity;
@@ -66,7 +67,7 @@ public class UdpClient extends Thread{
             String line = new String(packet.getData(), 0, packet.getLength());
 
             System.out.println(line);
-            handler.setText("\nUDP/Arrived:"+ line);
+            handler.setText("\nUDP/Arrived:"+ line+"\n", Color.GREEN);
 
         } catch (SocketException e) {
             e.printStackTrace();

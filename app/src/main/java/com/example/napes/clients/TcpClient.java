@@ -1,5 +1,7 @@
 package com.example.napes.clients;
 
+import android.graphics.Color;
+
 import com.example.napes.MainActivity;
 import com.example.napes.config.Config;
 
@@ -44,7 +46,7 @@ public class TcpClient extends Thread {
             printWriter.flush();
             printWriter.close();
             s.close();
-            handler.setText("\nTCP/Sent successfully "+ new Date().toString());
+            handler.setText("\nTCP/Sent successfully "+ new Date().toString()+"\n", Color.GREEN);
         }catch (IOException e){
             e.printStackTrace();
         }

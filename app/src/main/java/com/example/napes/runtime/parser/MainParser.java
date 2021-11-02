@@ -18,10 +18,12 @@ public class MainParser {
 
 
     public MainParser(String filePath) throws FileNotFoundException {
-      //  File file = Environment.getExternalStorageDirectory();
+        File file = Environment.getExternalStorageDirectory();
+        System.out.println("ABSOLUTE PATH: !!!!"+file.getAbsolutePath()+"/Documents/"+filePath);
         Scanner scanner;
         scanner = new Scanner(new File(filePath));
         scanner.useDelimiter("");
+
 
        LinkedList<String> linkedList = new LinkedList<>();
         while (scanner.hasNext()){

@@ -14,11 +14,16 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +41,7 @@ import com.example.napes.clients.UdpClient;
 import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.component.Component;
 import com.example.napes.runtime.parser.MainParser;
+import com.example.napes.runtime.service.Service;
 
 import java.io.FileNotFoundException;
 
@@ -46,9 +52,24 @@ public class MainActivity extends AppCompatActivity  {
 
     private  TextView textView;
     private EditText messageText;
-    private Button settingButton, sendButton;
+    private Button settingButton, sendButton, startButton;
     RadioGroup radioGroup;
     RadioButton radioButton;
+
+    private Service service;
+    private Component component;
+
+    public Service getService() {
+        return service;
+    }
+
+
+
+    public Component getComponent() {
+        return component;
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +96,31 @@ public class MainActivity extends AppCompatActivity  {
 
       //  messageText = findViewById(R.id.messageText);
         sendButton = findViewById(R.id.sendButton);
+        startButton = findViewById(R.id.startSimulation);
 
 
 
       //  if (StaticClients.getMqttCallback()==null)
-        StaticClients.setMqttCallback(new MqttCallbackImpl(this));
+//        StaticClients.setMqttCallback(new MqttCallbackImpl(this));
+
         StaticClients.setUdpClient(new UdpClient(this));
 
+        startButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                            StaticClients.setUdpClient(new UdpClient(MainActivity.this));
+                            StaticClients.getUdpClient().setParams("HELLO");
+                            StaticClients.getUdpClient().start();
+                         service = new Service(component,MainActivity.this);
+                        //service.serviceServerPorts();
+//                        StaticClients.getMqttCallback().setParams();
+                        service.serviceMain();
+
+
+                    }
+                }
+        );
 
         sendButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -124,7 +163,7 @@ public class MainActivity extends AppCompatActivity  {
         );
     }
     private void performFileSearch(){
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("*/*");
 
@@ -141,24 +180,28 @@ public class MainActivity extends AppCompatActivity  {
         if (requestCode == READ_REQUEST_CODE)
         {
             if (data!=null){
+                System.out.println("DATAAA: "+data.getDataString());
                 Uri uri = data.getData();
                 String path = uri.getPath();
+                System.out.println("URI+: "+ uri.getEncodedAuthority()+"   PATH:"+ path);
                 path = path.substring(path.indexOf(":")+1);
-              //  path= path.replaceAll("/storage/emulated/0","");
+
+              // path= path.replaceAll("/storage/emulated/0","");
+
 
               //  String file = "/sdcard/system/temp/RCR/client0.rcr";
                 MainParser mainParser = null;
-                System.out.println("PATH!!!: "+path);
+                System.out.println("\n\n\n\nPATH!!!: "+path);
                 try {
                     mainParser = new MainParser(path);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-                Component c = mainParser.getComponent();
+                component = mainParser.getComponent();
                 System.out.println("\n\n\n");
-                System.out.println(c);
+                System.out.println(component);
 
-                 setText(c.getcName());
+                 setText("\nComponent name : " + component.getcName(),0xFF000000);
             }
         }
     }
@@ -184,11 +227,19 @@ public class MainActivity extends AppCompatActivity  {
      //   Toast.makeText(this, "Selected: "+radioButton.getText(),Toast.LENGTH_SHORT);
     }
 
-    public  void setText(final String value){
+    public  void setText(final String value, int color){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+//                textView.setTextColor(color);
+//                textView.append(value);
+//
+                int start = textView.getText().length();
                 textView.append(value);
+                int end = textView.getText().length();
+                Spannable spannableText = (Spannable) textView.getText();
+                spannableText.setSpan(new ForegroundColorSpan(color), start, end, 0);
+                textView.append("\n");
             }
         });
     }

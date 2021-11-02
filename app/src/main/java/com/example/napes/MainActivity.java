@@ -109,9 +109,9 @@ public class MainActivity extends AppCompatActivity  {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                            StaticClients.setUdpClient(new UdpClient(MainActivity.this));
-                            StaticClients.getUdpClient().setParams("HELLO");
-                            StaticClients.getUdpClient().start();
+//                            StaticClients.setUdpClient(new UdpClient(MainActivity.this));
+//                            StaticClients.getUdpClient().setParams("HELLO");
+//                            StaticClients.getUdpClient().start();
                          service = new Service(component,MainActivity.this);
                         //service.serviceServerPorts();
 //                        StaticClients.getMqttCallback().setParams();

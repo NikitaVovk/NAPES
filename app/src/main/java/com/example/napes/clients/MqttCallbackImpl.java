@@ -43,7 +43,7 @@ public class MqttCallbackImpl implements MqttCallback {
     public void setParams() {
      //   this.mainActivity = mainActivity;
         try {
-             client = new MqttClient("tcp://"+ Config.ipAddress +":"+Config.mqttPort+"",
+             client = new MqttClient("tcp://"+ Config.ipAddressBroker +":"+Config.mqttPort+"",
                     "AndroidThingSub", new MemoryPersistence());
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
             mqttConnectOptions.setUserName("12qw34er");

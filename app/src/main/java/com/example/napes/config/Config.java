@@ -6,7 +6,9 @@ public class Config {
 
     public static FileOutputStream fos;
 
-    public  static String ipAddress = "192.168.1.217";
+    public  static String ipAddress = "192.168.1.4";
+
+    public  static String ipAddressBroker = "192.168.1.217";
 
     //MQTT
     public  static int mqttPort = 1883;

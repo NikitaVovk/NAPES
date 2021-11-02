@@ -52,6 +52,7 @@ public class ComponentParser extends PayLoadParser {
 
 
         component.setMqttBroker(mqttParser.parseMQTTBroker());
+        System.out.println(component.getMqttBroker());
         return component;
     }
 }

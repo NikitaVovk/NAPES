@@ -25,7 +25,7 @@ public class Service {
     Component component;
     MainActivity handler;
     public static UdpServer udpServer;
-    public static ServiceStates serviceStates;
+    public  ServiceStates serviceStates;
 
     public Service(Component component,MainActivity mainActivity) {
         this.component = component;
@@ -36,8 +36,11 @@ public class Service {
 
     public  void serviceMain(){
         eventService = new EventService(handler);
-        serviceStates = new ServiceStates(component,handler,eventService);
-        serviceStates.start();
+        for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
+            serviceStates = new ServiceStates(component,handler,eventService,stateMachine);
+            serviceStates.start();
+        }
+
 
     }
 

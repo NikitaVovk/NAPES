@@ -8,17 +8,20 @@ import com.example.napes.runtime.domains.events.Event;
 import com.example.napes.runtime.domains.events.EventList;
 import com.example.napes.runtime.domains.statemachine.StateMachine;
 import com.example.napes.runtime.domains.statemachine.StateMachineList;
+import com.example.napes.runtime.domains.statemachine.states.State;
 import com.example.napes.runtime.domains.statemachine.transitions.Transition;
 
 public class ServiceStates extends Thread{
     public  EventService eventService;
     Component component;
     MainActivity handler;
+    StateMachine stateMachine;
 
-    public ServiceStates(Component component, MainActivity mainActivity, EventService eventService) {
+    public ServiceStates(Component component, MainActivity mainActivity, EventService eventService, StateMachine stateMachine) {
         this.component = component;
         this.handler = mainActivity;
         this.eventService =eventService;
+        this.stateMachine = stateMachine;
     }
 
     public static Event searchEventByTopic(EventList eventList, String topic){
@@ -32,33 +35,44 @@ public class ServiceStates extends Thread{
 
     @Override
     public void run() {
-        handler.setText("\nSTARTING SIMULATING...\n", Color.GREEN);
-        StateMachineList stateMachineList = component.getStateMachineList();
+        handler.setText("\nSTARTING SIMULATING FSM: "+stateMachine.getmName()+"\n", Color.GREEN);
+
+        //StateMachineList stateMachineList = component.getStateMachineList();
         //StaticClients.getMqttCallback().setTopics();
 
-        com.example.napes.runtime.domains.statemachine.states.State currentState = getInitialState(stateMachineList.getStateMachines().get(0));
+        com.example.napes.runtime.domains.statemachine.states.State currentState = getInitialState(stateMachine);
         handler.setText("Current state: " +currentState.getsName()+"\n",Color.MAGENTA);
 
         while(true){
+
             synchronized (eventService){
+
+                System.out.println(Thread.currentThread().getName());
+                Event arrivedEventTemp;
                 try {
+
                     eventService.wait();
+                    arrivedEventTemp = new Event(eventService.getArrivedEvent());
+                    for (Transition currentTransition:currentState.getTransitionList().getTransitions()) {
+                        //component.notify();
+
+
+                        System.out.println("ARRIVED EVENT: "+arrivedEventTemp.geteName());
+
+                        // System.out.println("TRUE OR FALSE : "+currentTransition.geteName().equals(eventService.getArrivedEvent().geteName()));
+                        if (arrivedEventTemp != null && currentTransition.geteName().equals(arrivedEventTemp.geteName()))
+                            currentState = getStateByName(stateMachine, currentTransition.getsName());
+
+                        handler.setText("Current state: " + currentState.getsName()+"\n",Color.MAGENTA);
+
+
+                    }
+                   // component.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                for (Transition currentTransition:currentState.getTransitionList().getTransitions()) {
-
-
-
-                    System.out.println("TRUE OR FALSE : "+currentTransition.geteName().equals(eventService.getArrivedEvent().geteName()));
-                    if (eventService.getArrivedEvent() != null && currentTransition.geteName().equals(eventService.getArrivedEvent().geteName()))
-                        currentState = getStateByName(stateMachineList.getStateMachines().get(0), currentTransition.getsName());
-                    eventService.setArrivedEvent(null);
-                    handler.setText("Current state: " + currentState.getsName()+"\n",Color.MAGENTA);
-
-
-            }
+               // eventService.setArrivedEvent(null);
             }
 
         }

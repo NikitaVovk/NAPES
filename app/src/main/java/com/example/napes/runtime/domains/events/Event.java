@@ -6,6 +6,7 @@ public class Event {
     String mqtt_eName;
     int timeout;
 
+
     public Event() {
     }
 
@@ -14,6 +15,11 @@ public class Event {
         this.eType = eType;
         this.mqtt_eName = mqtt_eName;
     }
+    public Event(Event event) {
+        this.eName = event.eName;
+        this.eType = event.eType;
+        this.mqtt_eName = event.mqtt_eName;
+    }
 
     public Event(String eName, String eType, String mqtt_eName, int timeout) {
         this.eName = eName;
@@ -21,6 +27,13 @@ public class Event {
         this.mqtt_eName = mqtt_eName;
         this.timeout = timeout;
     }
+
+//    public Event(Event event) {
+//        this.eName = event.eName;
+//        this.eType = event.eType;
+//        this.mqtt_eName =event.mqtt_eName;
+//        this.timeout = event.timeout;
+//    }
 
     public String geteName() {
         return eName;

@@ -18,12 +18,14 @@ import com.example.napes.runtime.domains.statemachine.transitions.Transition;
 import com.example.napes.runtime.service.servers.TcpServer;
 import com.example.napes.runtime.service.servers.UdpServer;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Service {
 
      EventService eventService;
      ServicePorts servicePorts;
+     ServiceFlows serviceFlows;
     Component component;
     MainActivity handler;
     public static UdpServer udpServer;
@@ -38,13 +40,19 @@ public class Service {
 
     public  void serviceMain(){
         eventService = new EventService(handler);
+
         //
         Config.ipAddressBroker= component.getMqttBroker().getEndPointDefp().getIP();
-        servicePorts = new ServicePorts(component,handler);
+        ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>();
+
         for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
             serviceStates = new ServiceStates(component,handler,eventService,stateMachine);
+            serviceStatesArrayList.add(serviceStates);
+            //serviceFlows = new ServiceFlows(handler,serviceStates.map,stateMachine);
             serviceStates.start();
         }
+        System.out.println("ArrayList<ServiceStates> serviceStatesArrayList: "+ serviceStatesArrayList);
+        servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
 
         servicePorts.serviceServerPorts();
 

@@ -11,11 +11,15 @@ import com.example.napes.runtime.domains.statemachine.StateMachineList;
 import com.example.napes.runtime.domains.statemachine.states.State;
 import com.example.napes.runtime.domains.statemachine.transitions.Transition;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ServiceStates extends Thread{
     public  EventService eventService;
     Component component;
     MainActivity handler;
     StateMachine stateMachine;
+    Map<String,String> map;
 
     public ServiceStates(Component component, MainActivity mainActivity, EventService eventService, StateMachine stateMachine) {
         this.component = component;
@@ -32,16 +36,35 @@ public class ServiceStates extends Thread{
         return null;
     }
 
+    public StateMachine getStateMachine() {
+        return stateMachine;
+    }
+
+    public void setStateMachine(StateMachine stateMachine) {
+        this.stateMachine = stateMachine;
+    }
+
+    public Map<String, String> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, String> map) {
+        this.map = map;
+    }
 
     @Override
     public void run() {
         handler.setText("\nSTARTING SIMULATING FSM: "+stateMachine.getmName()+"\n", Color.GREEN);
+        map= new HashMap<String, String>();
+
 
         //StateMachineList stateMachineList = component.getStateMachineList();
         //StaticClients.getMqttCallback().setTopics();
 
         com.example.napes.runtime.domains.statemachine.states.State currentState = getInitialState(stateMachine);
+        map.put(stateMachine.getmName(),currentState.getsName());
         handler.setText("Current state: " +currentState.getsName()+"\n",Color.MAGENTA);
+
 
         while(true){
 
@@ -60,8 +83,10 @@ public class ServiceStates extends Thread{
                         System.out.println("ARRIVED EVENT: "+arrivedEventTemp.geteName());
 
                         // System.out.println("TRUE OR FALSE : "+currentTransition.geteName().equals(eventService.getArrivedEvent().geteName()));
-                        if (arrivedEventTemp != null && currentTransition.geteName().equals(arrivedEventTemp.geteName()))
+                        if (arrivedEventTemp != null && currentTransition.geteName().equals(arrivedEventTemp.geteName())){
                             currentState = getStateByName(stateMachine, currentTransition.getsName());
+                            map.put(stateMachine.getmName(),currentState.getsName());
+                        }
 
                         handler.setText("Current state: " + currentState.getsName()+"\n",Color.MAGENTA);
 
@@ -72,6 +97,7 @@ public class ServiceStates extends Thread{
                     e.printStackTrace();
                 }
 
+                System.out.println(map);
                // eventService.setArrivedEvent(null);
             }
 

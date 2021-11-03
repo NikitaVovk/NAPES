@@ -7,6 +7,14 @@ public class StateFlow {
     String fName;
     FlowList anonFlow;
 
+    public FlowList getAnonFlow() {
+        return anonFlow;
+    }
+
+    public void setAnonFlow(FlowList anonFlow) {
+        this.anonFlow = anonFlow;
+    }
+
     public FlowList getFlow() {
         return anonFlow;
     }

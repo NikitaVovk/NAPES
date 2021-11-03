@@ -52,6 +52,7 @@ public class UdpClient extends Thread{
             socket = new DatagramSocket();
             address = InetAddress.getByName(dstAddress);
 
+            System.out.println("SENDING UDP TO :" + address+":"+dstPort);
             // send request
             byte[] buf = new byte[256];
             buf = message.getBytes();

@@ -26,16 +26,17 @@ public class ServicePorts extends Service {
                 startServer(port.getpTransport(), port.getEndPointHere().getPort());
             }
             if (port.getpType().equals("c")){
-                startClient(port.getpTransport(), port.getEndPointHere().getPort());
+                startClient(port.getpTransport(), port.getClientInfo().getEndPoint().getPort(), port.getClientInfo().getEndPoint().getIP());
             }
 
         }
     }
-    private void startClient(String pTransport, int port) {
+    private void startClient(String pTransport, int port, String ipAdress) {
         System.out.println("STARTING CLIENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if (pTransport.equals("U")) {
             StaticClients.setUdpClient(new UdpClient(handler));
             Config.udpPort = port;
+            Config.ipAddress = ipAdress;
             StaticClients.getUdpClient().setParams("hello");
             StaticClients.getUdpClient().start();
         }

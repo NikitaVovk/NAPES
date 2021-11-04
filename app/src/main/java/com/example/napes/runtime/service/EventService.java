@@ -8,15 +8,21 @@ import com.example.napes.runtime.domains.events.Event;
 
 public class EventService {
     private   Event arrivedEvent;
+    private MainActivity handler;
 
 
 
     public EventService(MainActivity mainActivity) {
         arrivedEvent=null;
-        StaticClients.setMqttCallback(new MqttCallbackImpl(mainActivity));
+        this.handler = mainActivity;
+
+
+    }
+
+    public void startMqttClient(){
+        StaticClients.setMqttCallback(new MqttCallbackImpl(handler));
         StaticClients.getMqttCallback().setEventService(this);
         StaticClients.getMqttCallback().setParams();
-
     }
 
     public Event getArrivedEvent() {

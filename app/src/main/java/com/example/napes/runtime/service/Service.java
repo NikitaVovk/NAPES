@@ -39,10 +39,13 @@ public class Service {
 
 
     public  void serviceMain(){
+
+        Config.ipAddressBroker= component.getMqttBroker().getEndPointDefp().getIP();
         eventService = new EventService(handler);
+        eventService.startMqttClient();
 
         //
-        Config.ipAddressBroker= component.getMqttBroker().getEndPointDefp().getIP();
+
         ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>();
 
         for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {

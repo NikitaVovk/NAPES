@@ -16,6 +16,7 @@ import java.util.Map;
 
 public class ServiceStates extends Thread{
     public  EventService eventService;
+    public ServiceActions serviceActions;
     Component component;
     MainActivity handler;
     StateMachine stateMachine;
@@ -62,6 +63,8 @@ public class ServiceStates extends Thread{
         //StaticClients.getMqttCallback().setTopics();
 
         com.example.napes.runtime.domains.statemachine.states.State currentState = getInitialState(stateMachine);
+        ServiceActions sa = new ServiceActions(component.getEventList());
+        sa.doActions(currentState.getOnEntry().getActionList());
         map.put(stateMachine.getmName(),currentState.getsName());
         handler.setText("Current state: " +currentState.getsName()+"\n",Color.MAGENTA);
 
@@ -84,7 +87,21 @@ public class ServiceStates extends Thread{
 
                         // System.out.println("TRUE OR FALSE : "+currentTransition.geteName().equals(eventService.getArrivedEvent().geteName()));
                         if (arrivedEventTemp != null && currentTransition.geteName().equals(arrivedEventTemp.geteName())){
+                            //#########################################################
+                            //do on exit action on currentState  and WITHOUT? transition actions
+                            serviceActions = new ServiceActions(component.getEventList());
+                            serviceActions.doActions(currentState.getOnExit().getActionList());
+
                             currentState = getStateByName(stateMachine, currentTransition.getsName());
+
+
+                            serviceActions.doActions(currentTransition.getActionList());
+                            serviceActions.doActions(currentState.getOnEntry().getActionList());
+
+                            //currentTransition.getActionList();
+                            //currentState.getOnEntry().getActionList()
+
+                            //do on entry action on currentState  and   transition actions
                             map.put(stateMachine.getmName(),currentState.getsName());
                         }
 

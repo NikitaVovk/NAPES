@@ -57,6 +57,11 @@ public class ServiceFlows extends Thread {
 
     @Override
     public void run() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if (port.getpTransport().equals("U")) {
             System.out.println("MAP IN SERVICE FLOW:"+map);
 while (true){

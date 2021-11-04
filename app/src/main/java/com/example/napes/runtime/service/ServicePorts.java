@@ -11,6 +11,7 @@ import com.example.napes.runtime.domains.component.Component;
 import com.example.napes.runtime.domains.ports.Port;
 import com.example.napes.runtime.domains.ports.PortList;
 import com.example.napes.runtime.service.servers.TcpServer;
+import com.example.napes.runtime.service.servers.TcpServerNIO;
 import com.example.napes.runtime.service.servers.UdpServer;
 
 import java.util.ArrayList;
@@ -68,8 +69,11 @@ public class ServicePorts extends Service {
     private void startServer(String pTransport, int port){
         if (pTransport.equals("T")){
             handler.setText("\nStarting TCP server on port"+port+"...\n", Color.BLACK);
-            TcpServer tcpServer = new TcpServer(port,handler);
-            tcpServer.start();
+//            TcpServer tcpServer = new TcpServer(port,handler);
+//            tcpServer.start();
+            TcpServerNIO tcpServerNIO = new TcpServerNIO(handler,port);
+            tcpServerNIO.start();
+
         }
         else if (pTransport.equals("U")){
             handler.setText("\nStarting UDP server on port"+port+"...\n", Color.BLACK);

@@ -30,17 +30,17 @@ public class TcpClientNIO extends Thread{
         isBinded = false;
     }
     public void connect(){
-        InetSocketAddress hostAddress = new InetSocketAddress("10.0.2.2", dstPort);
+        InetSocketAddress hostAddress = new InetSocketAddress(dstAddress, dstPort);
         System.out.println("CONNECTING TO + "+hostAddress);
         try {
             client = SocketChannel.open();
 
             //if (client.)
 
-            System.out.println("CONNECTING TO + " + hostAddress);
+           // System.out.println("CONNECTING TO + " + hostAddress);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && !isBinded) {
-                client.bind(new InetSocketAddress(56000));
+               // client.bind(new InetSocketAddress(56002));
                 isBinded = true;
             }
 

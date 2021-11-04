@@ -80,7 +80,7 @@ while (true){
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                       // StaticClients.getUdpClient().start();
+                        StaticClients.getUdpClient().start();
                     }
 
 

@@ -22,9 +22,12 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Layout;
 import android.text.Spannable;
+import android.text.method.ScrollingMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         textView = (TextView)findViewById(R.id.textViewMqtt);
+        textView.setMovementMethod(new ScrollingMovementMethod());
         //MqttCallbackImpl mqttCallback = new MqttCallbackImpl(this);
         addListenerOnButton();
     }
@@ -240,6 +244,25 @@ public class MainActivity extends AppCompatActivity  {
                 Spannable spannableText = (Spannable) textView.getText();
                 spannableText.setSpan(new ForegroundColorSpan(color), start, end, 0);
                 textView.append("\n");
+
+
+                Layout layout = textView.getLayout();
+                if (layout != null) {
+                    int lineTop = layout.getLineTop(textView.getLineCount());
+//                    final int scrollAmount = lineTop + textView.getPaddingTop()
+//                            + textView.getPaddingBottom() - textView.getBottom() + textView.getTop();
+                    final int scrollAmount = textView.getLayout().getLineTop(textView.getLineCount()) - textView.getHeight();
+
+                    if (scrollAmount > 0) {
+                        System.out.println("GETSCROLL Y "+scrollAmount );
+                        textView.setGravity(Gravity.BOTTOM);
+                      //  textView.scrollBy(0, scrollAmount);
+                    } else {
+                        textView.scrollTo(0, 0);
+                    }
+
+                    //textView.scrollTo(textView.getScrollX(),textView.getScrollY());
+                }
             }
         });
     }

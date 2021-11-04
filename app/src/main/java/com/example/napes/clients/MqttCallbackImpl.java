@@ -10,6 +10,7 @@ import com.example.napes.runtime.service.Service;
 import com.example.napes.runtime.service.ServiceStates;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -44,10 +45,12 @@ public class MqttCallbackImpl implements MqttCallback {
      //   this.mainActivity = mainActivity;
         try {
              client = new MqttClient("tcp://"+ Config.ipAddressBroker +":"+Config.mqttPort+"",
-                    "AndroidThingSub", new MemoryPersistence());
+                     MqttAsyncClient.generateClientId(), new MemoryPersistence());
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
+
             mqttConnectOptions.setUserName("12qw34er");
             mqttConnectOptions.setPassword("12qw34er".toCharArray());
+
             client.setCallback(this);
             client.connect(mqttConnectOptions);
            // String topic = "test/";

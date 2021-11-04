@@ -27,7 +27,9 @@ public class ServicePorts extends Service {
     public void serviceServerPorts(){
 
         PortList portList = component.getPortList();
+        System.out.println("PORTLIST!!!!!!!!!!!!!!!!!!!!!!"+portList);
         for (Port port: portList.getPorts()) {
+            System.out.println("FOR PORTLIST : " +port.getpName());
             if (port.getpType().equals("s")){
                 startServer(port.getpTransport(), port.getEndPointHere().getPort());
             }
@@ -41,8 +43,9 @@ public class ServicePorts extends Service {
     private void startClient(Port port) {
         System.out.println("STARTING CLIENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         for (ServiceStates ss:serviceStatesArrayList) {
+            System.out.println("LOOK : "+ss.getStateMachine().getmName()+"  "+ port.getClientInfo().getmName()+" PORT " +port.getpName()+" BOOL "+ ss.getStateMachine().getmName().equals(port.getClientInfo().getmName()));
            if (ss.getStateMachine().getmName().equals(port.getClientInfo().getmName())){
-               serviceFlows= new ServiceFlows(port,handler,ss.getMap(),ss.getStateMachine());
+               serviceFlows= new ServiceFlows(port,handler,ss.getMap(),ss.getStateMachine(),component.getFlowList());
                serviceFlows.start();
            }
 

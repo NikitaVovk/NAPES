@@ -21,7 +21,7 @@ public class MainParser {
         File file = Environment.getExternalStorageDirectory();
         System.out.println("ABSOLUTE PATH: !!!!"+file.getAbsolutePath()+"/Documents/"+filePath);
         Scanner scanner;
-        //scanner = new Scanner(new File(file.getAbsolutePath()+"/Documents/"+filePath));
+      //  scanner = new Scanner(new File(file.getAbsolutePath()+"/Documents/"+filePath));
         scanner = new Scanner(new File(filePath));
         scanner.useDelimiter("");
 

@@ -49,7 +49,7 @@ public class UdpClient extends Thread{
         running = true;
 
         try {
-            socket = new DatagramSocket();
+            socket = new DatagramSocket(65256);
             address = InetAddress.getByName(dstAddress);
 
             System.out.println("SENDING UDP TO :" + address+":"+dstPort);

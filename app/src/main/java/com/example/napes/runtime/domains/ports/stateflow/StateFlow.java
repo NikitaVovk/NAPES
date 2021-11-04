@@ -15,9 +15,7 @@ public class StateFlow {
         this.anonFlow = anonFlow;
     }
 
-    public FlowList getFlow() {
-        return anonFlow;
-    }
+
 
     public void setFlow(FlowList flow) {
         this.anonFlow = flow;

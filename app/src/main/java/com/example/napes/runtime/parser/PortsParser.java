@@ -91,7 +91,7 @@ public class PortsParser  extends PayLoadParser{
         if (linkedList.get(1).equals("{")||
                 linkedList.get(1).equals("[")){
             stateFlow.setFlow(flowParser.parseFlowList(true));
-
+            linkedList.pop();
         }
         else {
             stateFlow.setfName(readTillTo(';', '}'));

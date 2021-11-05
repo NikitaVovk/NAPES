@@ -1,5 +1,6 @@
 package com.example.napes.clients;
 
+import android.graphics.Color;
 import android.util.Log;
 
 import com.example.napes.MainActivity;
@@ -19,6 +20,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.FileOutputStream;
+import java.util.ListIterator;
 
 public class MqttCallbackImpl implements MqttCallback {
     private static final String TAG = "TAG" ;
@@ -55,7 +57,7 @@ public class MqttCallbackImpl implements MqttCallback {
             client.connect(mqttConnectOptions);
            // String topic = "test/";
             for (Event event : mainActivity.getComponent().getEventList().getEvents()){
-            if (event.getMqtt_eName()!=null){
+            if (event.getMqtt_eName()!=null){//&&!event.geteType().equals("o")){
                 System.out.println("SUBBING: "+event.getMqtt_eName() );
             client.subscribe(event.getMqtt_eName());}
             }
@@ -73,7 +75,7 @@ public class MqttCallbackImpl implements MqttCallback {
     public void clientPublish(String message){
         try {
             client.publish(Config.mqttTopic,new MqttMessage(message.getBytes()));
-           // mainActivity.setText("\nMQTT/Message sent!");
+            mainActivity.setText("\nMQTT/Message sent!", Color.RED);
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -81,13 +83,21 @@ public class MqttCallbackImpl implements MqttCallback {
     }
 
     @Override
-    public synchronized void messageArrived(String topic, MqttMessage message) throws Exception {
+    public  void messageArrived(String topic, MqttMessage message) throws Exception {
         String payload = new String(message.getPayload());
         System.out.println(payload);
+//        while (ServiceStates.isRunning){
+//
+//            System.out.println("isRunning");
+//        }
         synchronized (eventService){
-            eventService.setArrivedEvent( ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
-            System.out.println("EVENT Arrived:"+ eventService.getArrivedEvent());
-            eventService.notifyAll();
+            //eventService.setArrivedEvent( ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
+          //  eventService.getArrivedQueueEvents().add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
+            ListIterator<Event> eventListIterator = eventService.getArrivedQueueEvents().listIterator();
+            eventListIterator.add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
+            eventService.setChanged(true);
+           // System.out.println("EVENT Arrived:"+ eventService.getArrivedEvent());
+        eventService.notify();
         }
 
 

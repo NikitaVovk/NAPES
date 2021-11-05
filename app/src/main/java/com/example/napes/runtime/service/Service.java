@@ -57,7 +57,7 @@ public class Service {
         System.out.println("ArrayList<ServiceStates> serviceStatesArrayList: "+ serviceStatesArrayList);
         servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
 
-        servicePorts.serviceServerPorts();
+      //  servicePorts.serviceServerPorts();
 
 
 

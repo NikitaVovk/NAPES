@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity  {
                     final int scrollAmount = textView.getLayout().getLineTop(textView.getLineCount()) - textView.getHeight();
 
                     if (scrollAmount > 0) {
-                        System.out.println("GETSCROLL Y "+scrollAmount );
+//                        System.out.println("GETSCROLL Y "+scrollAmount );
                         textView.setGravity(Gravity.BOTTOM);
                       //  textView.scrollBy(0, scrollAmount);
                     } else {

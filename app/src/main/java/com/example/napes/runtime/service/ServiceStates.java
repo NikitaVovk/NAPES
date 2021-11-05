@@ -12,6 +12,9 @@ import com.example.napes.runtime.domains.statemachine.states.State;
 import com.example.napes.runtime.domains.statemachine.transitions.Transition;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Map;
 
 public class ServiceStates extends Thread{
@@ -21,8 +24,10 @@ public class ServiceStates extends Thread{
     MainActivity handler;
     StateMachine stateMachine;
     Map<String,String> map;
+    public static boolean isRunning = false;
 
     public ServiceStates(Component component, MainActivity mainActivity, EventService eventService, StateMachine stateMachine) {
+        super(stateMachine.getmName());
         this.component = component;
         this.handler = mainActivity;
         this.eventService =eventService;
@@ -63,40 +68,69 @@ public class ServiceStates extends Thread{
         //StaticClients.getMqttCallback().setTopics();
 
         com.example.napes.runtime.domains.statemachine.states.State currentState = getInitialState(stateMachine);
-        ServiceActions sa = new ServiceActions(component.getEventList());
+        ServiceActions sa = new ServiceActions(component.getEventList(),eventService);
         sa.doActions(currentState.getOnEntry().getActionList());
+
         map.put(stateMachine.getmName(),currentState.getsName());
         handler.setText("Current state: " +currentState.getsName()+"\n",Color.MAGENTA);
 
 
         while(true){
+            Event arrivedEventTemp;
+            LinkedList<Event> tempEvents = new LinkedList<>();
 
             synchronized (eventService){
 
-                System.out.println(Thread.currentThread().getName());
-                Event arrivedEventTemp;
+                System.out.println("THREAD RUNNING"+Thread.currentThread().getName());
+
                 try {
 
+
+                  //  eventService.notifyAll();
+                    if (!eventService.isChanged())
                     eventService.wait();
-                    arrivedEventTemp = new Event(eventService.getArrivedEvent());
+
+                    tempEvents =  new LinkedList<>(eventService.getArrivedQueueEvents());
+                    eventService.setArrivedQueueEvents(new LinkedList<>());
+                    eventService.setChanged(false);
+
+
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("IM waiting and queue is : "+ tempEvents);
+                    //##########################################################
+                    for (ListIterator<Event> iteratorEvent = tempEvents.listIterator(); iteratorEvent.hasNext();) {
+
+
+                          //  System.out.println("Iterator: " + iteratorEvent.next());
+                           // arrivedEventTemp = new Event(iteratorEvent.next());
+
+                            arrivedEventTemp = iteratorEvent.next();
+
+                        // while (eventService.getArrivedEventLIST()!=null)
+//                    arrivedEventTemp = new Event(eventService.getArrivedEvent());
                     for (Transition currentTransition:currentState.getTransitionList().getTransitions()) {
                         //component.notify();
 
 
-                        System.out.println("ARRIVED EVENT: "+arrivedEventTemp.geteName());
+                        System.out.println("ARRIVED EVENT: "+arrivedEventTemp.geteName()+" == "+currentTransition.geteName());
 
                         // System.out.println("TRUE OR FALSE : "+currentTransition.geteName().equals(eventService.getArrivedEvent().geteName()));
                         if (arrivedEventTemp != null && currentTransition.geteName().equals(arrivedEventTemp.geteName())){
                             //#########################################################
                             //do on exit action on currentState  and WITHOUT? transition actions
-                            serviceActions = new ServiceActions(component.getEventList());
-                            serviceActions.doActions(currentState.getOnExit().getActionList());
+
+                            //serviceActions = new ServiceActions(component.getEventList());
+                            sa.doActions(currentState.getOnExit().getActionList());
 
                             currentState = getStateByName(stateMachine, currentTransition.getsName());
 
 
-                            serviceActions.doActions(currentTransition.getActionList());
-                            serviceActions.doActions(currentState.getOnEntry().getActionList());
+                            sa.doActions(currentTransition.getActionList());
+                            System.out.println("HERE 11111111222222 "+currentState.getOnEntry().getActionList());
+                            sa.doActions(currentState.getOnEntry().getActionList());
 
                             //currentTransition.getActionList();
                             //currentState.getOnEntry().getActionList()
@@ -109,10 +143,9 @@ public class ServiceStates extends Thread{
 
 
                     }
+
                    // component.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
 
                 System.out.println(map);
                // eventService.setArrivedEvent(null);

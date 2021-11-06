@@ -6,9 +6,10 @@ import com.example.napes.MainActivity;
 import com.example.napes.runtime.domains.component.Component;
 import com.example.napes.runtime.domains.events.Event;
 import com.example.napes.runtime.domains.events.EventList;
+import com.example.napes.runtime.domains.statemachine.states.State;
 import com.example.napes.runtime.domains.statemachine.StateMachine;
 import com.example.napes.runtime.domains.statemachine.StateMachineList;
-import com.example.napes.runtime.domains.statemachine.states.State;
+
 import com.example.napes.runtime.domains.statemachine.transitions.Transition;
 
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class ServiceStates extends Thread{
     MainActivity handler;
     StateMachine stateMachine;
     Map<String,String> map;
-    public static boolean isRunning = false;
+    public  boolean isServed ;
 
     public ServiceStates(Component component, MainActivity mainActivity, EventService eventService, StateMachine stateMachine) {
         super(stateMachine.getmName());
@@ -32,6 +33,7 @@ public class ServiceStates extends Thread{
         this.handler = mainActivity;
         this.eventService =eventService;
         this.stateMachine = stateMachine;
+        this.isServed = false;
     }
 
     public static Event searchEventByTopic(EventList eventList, String topic){
@@ -58,51 +60,77 @@ public class ServiceStates extends Thread{
         this.map = map;
     }
 
-    @Override
-    public void run() {
-        handler.setText("\nSTARTING SIMULATING FSM: "+stateMachine.getmName()+"\n", Color.GREEN);
+
+    public void setInitialStateForFSM(){
         map= new HashMap<String, String>();
+         currentState = getInitialState(stateMachine);
+         sa = new ServiceActions(component.getEventList(),eventService);
+        sa.doActions(currentState.getOnEntry().getActionList());
+        map.put(stateMachine.getmName(),currentState.getsName());
+        tempEvents = new LinkedList<>();
+
+    }
+    public void setTempEvents(LinkedList<Event> events){
+        tempEvents = events;
 
 
+    }
+
+   private com.example.napes.runtime.domains.statemachine.states.State currentState;
+    LinkedList<Event> tempEvents;
+    ServiceActions sa;
+
+    public com.example.napes.runtime.domains.statemachine.states.State getCurrentState() {
+        return currentState;
+    }
+
+    @Override
+    public  void run() {
+        while (true){
+       // handler.setText("\nSTARTING SIMULATING FSM: "+stateMachine.getmName()+"\n", Color.GREEN);
+//        map= new HashMap<String, String>();
+
+            System.out.println("YA TYTA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         //StateMachineList stateMachineList = component.getStateMachineList();
         //StaticClients.getMqttCallback().setTopics();
 
-        com.example.napes.runtime.domains.statemachine.states.State currentState = getInitialState(stateMachine);
-        ServiceActions sa = new ServiceActions(component.getEventList(),eventService);
-        sa.doActions(currentState.getOnEntry().getActionList());
+//############################################################ this was correct
+//        currentState = getInitialState(stateMachine);
+//        ServiceActions sa = new ServiceActions(component.getEventList(),eventService);
+//        sa.doActions(currentState.getOnEntry().getActionList());
+//        map.put(stateMachine.getmName(),currentState.getsName());
+//        handler.setText("Current state: " +currentState.getsName()+"\n",Color.MAGENTA);
 
-        map.put(stateMachine.getmName(),currentState.getsName());
-        handler.setText("Current state: " +currentState.getsName()+"\n",Color.MAGENTA);
-
-
-        while(true){
+            isServed = false;
+//        while(true){
             Event arrivedEventTemp;
-            LinkedList<Event> tempEvents = new LinkedList<>();
-
-            synchronized (eventService){
-
-                System.out.println("THREAD RUNNING"+Thread.currentThread().getName());
-
-                try {
-
-
-                  //  eventService.notifyAll();
-                    if (!eventService.isChanged())
-                    eventService.wait();
-
-                    tempEvents =  new LinkedList<>(eventService.getArrivedQueueEvents());
-                    eventService.setArrivedQueueEvents(new LinkedList<>());
-                    eventService.setChanged(false);
-
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+//          //  LinkedList<Event> tempEvents = new LinkedList<>();
+//
+//            synchronized (eventService){
+//
+//                System.out.println("THREAD RUNNING"+Thread.currentThread().getName());
+//
+//                try {
+//
+//
+//                  //  eventService.notifyAll();
+//                    if (!eventService.isChanged())
+//                    eventService.wait();
+//
+//                    tempEvents =  new LinkedList<>(eventService.getArrivedQueueEvents());
+//                    eventService.setArrivedQueueEvents(new LinkedList<>());
+//                    eventService.setChanged(false);
+//
+//
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
             System.out.println("IM waiting and queue is : "+ tempEvents);
                     //##########################################################
                     for (ListIterator<Event> iteratorEvent = tempEvents.listIterator(); iteratorEvent.hasNext();) {
-
+                        System.out.println("CURRENT STATE::::"+ currentState);
 
                           //  System.out.println("Iterator: " + iteratorEvent.next());
                            // arrivedEventTemp = new Event(iteratorEvent.next());
@@ -151,8 +179,19 @@ public class ServiceStates extends Thread{
                // eventService.setArrivedEvent(null);
             }
 
+                    isServed = true;
+                synchronized (this){
+                    try {
+
+                        System.out.println("CZEKAJU");
+                        this.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
         }
-    }
+        }
+
 
     private com.example.napes.runtime.domains.statemachine.states.State getInitialState(StateMachine stateMachine){
         for (com.example.napes.runtime.domains.statemachine.states.State state:stateMachine.getStateList().getStates()) {

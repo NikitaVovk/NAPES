@@ -24,6 +24,7 @@ import java.util.Date;
 public class Service {
 
      EventService eventService;
+     ServiceFsm serviceFsm;
      ServicePorts servicePorts;
      ServiceFlows serviceFlows;
     Component component;
@@ -44,18 +45,20 @@ public class Service {
         eventService = new EventService(handler);
         eventService.startMqttClient();
 
-        //
+        serviceFsm = new ServiceFsm(eventService,component,handler,component.getStateMachineList());
+        serviceFsm.start();
 
-        ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>();
-
-        for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
-            serviceStates = new ServiceStates(component,handler,eventService,stateMachine);
-            serviceStatesArrayList.add(serviceStates);
-            //serviceFlows = new ServiceFlows(handler,serviceStates.map,stateMachine);
-            serviceStates.start();
-        }
-        System.out.println("ArrayList<ServiceStates> serviceStatesArrayList: "+ serviceStatesArrayList);
-        servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
+//#################################################################################################
+//        ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>();
+//
+//        for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
+//            serviceStates = new ServiceStates(component,handler,eventService,stateMachine);
+//            serviceStatesArrayList.add(serviceStates);
+//            //serviceFlows = new ServiceFlows(handler,serviceStates.map,stateMachine);
+//            serviceStates.start();
+//        }
+//        System.out.println("ArrayList<ServiceStates> serviceStatesArrayList: "+ serviceStatesArrayList);
+//        servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
 
       //  servicePorts.serviceServerPorts();
 

@@ -26,7 +26,7 @@ public class EventService  {
         arrivedEvent=null;
         this.handler = mainActivity;
         this.arrivedQueueEvents = new LinkedList<>();
-
+        this.isChanged = false;
 
     }
 

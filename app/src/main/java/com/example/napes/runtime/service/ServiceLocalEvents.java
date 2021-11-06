@@ -20,7 +20,7 @@ public class ServiceLocalEvents extends Thread{
     }
     @Override
     public void run(){
-        synchronized (eventService){
+
 
             try {
                 System.out.println("WAITIIIIIIING................................................"+localEvent.geteName());
@@ -29,10 +29,13 @@ public class ServiceLocalEvents extends Thread{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        synchronized (eventService){
            // eventService.setArrivedEvent(localEvent);
-          //  eventService.getArrivedQueueEvents().add(localEvent);
-            ListIterator<Event> eventListIterator = eventService.getArrivedQueueEvents().listIterator();
-            eventListIterator.add(localEvent);
+            eventService.getArrivedQueueEvents().add(localEvent);
+
+//            ListIterator<Event> eventListIterator = eventService.getArrivedQueueEvents().listIterator();
+//            eventListIterator.add(localEvent);
+
             eventService.setChanged(true);
             eventService.notifyAll();
             System.out.println("IM WOKEN UP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+localEvent.geteName());

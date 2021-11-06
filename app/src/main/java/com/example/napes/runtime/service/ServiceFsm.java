@@ -10,6 +10,7 @@ import com.example.napes.runtime.domains.statemachine.StateMachineList;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class ServiceFsm extends Thread {
     public  EventService eventService;
@@ -35,6 +36,7 @@ public class ServiceFsm extends Thread {
             handler.setText("\nSTARTING SIMULATING FSM: "+stateMachine.getmName()+"\n", Color.GREEN);
             serviceStatesArrayList.add(serviceStates);
         }
+        LinkedList<Event> eventLinkedList = null;
 //        for (ServiceStates ss:serviceStatesArrayList){
 //            ss.setInitialStateForFSM();
 //            // ss.setTempEvents(new LinkedList<>(eventService.getArrivedQueueEvents()));
@@ -42,28 +44,46 @@ public class ServiceFsm extends Thread {
                     while(true){
 
 
-            synchronized (eventService){
+
+                        synchronized (eventService){
 
                 try {
 
+
+                    System.out.println("IS CHANGED ::::::::::"+eventService.isChanged());
                     if (!eventService.isChanged()){
                         System.out.println("UnderIfWaiting");
+                        eventService.setArrivedQueueEvents(new LinkedList<>());
+                        eventLinkedList = null;
                     eventService.wait();
 
-
                     }
+                    if (eventLinkedList==null)
+                    eventLinkedList = new LinkedList<>(eventService.getArrivedQueueEvents());
+                    //I need to pop this list
+                    else //flushing the queue
+                    {
+                        ListIterator<Event> listIterator = eventLinkedList.listIterator();
+                        while (listIterator.hasNext()){
+                            listIterator.next();
+                            eventService.getArrivedQueueEvents().pop();
+                        }
+                        eventLinkedList = new LinkedList<>(eventService.getArrivedQueueEvents());
+                    }
+
+                    eventService.setChanged(false);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
 
-                        eventService.setChanged(false);
+
 
                     for (ServiceStates ss:serviceStatesArrayList){
 
-                        ss.setTempEvents(new LinkedList<>(eventService.getArrivedQueueEvents()));
+                        ss.setTempEvents(new LinkedList<>(eventLinkedList));
 
-                        System.out.println("LISTAAAAA: "+eventService.getArrivedQueueEvents());
+                        System.out.println("LISTAAAAA: "+eventLinkedList);
 
                         if (!ss.isAlive())
                         ss.start();
@@ -79,7 +99,11 @@ public class ServiceFsm extends Thread {
                         System.out.println("STARTED SOME");
                         for (ServiceStates ss:serviceStatesArrayList){
                             while (!ss.isServed){
-
+                                try {
+                                    Thread.currentThread().sleep(100);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
                             }
 
                         //    System.out.println("YA TYTA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -89,7 +113,8 @@ public class ServiceFsm extends Thread {
 
 
 
-                        eventService.setArrivedQueueEvents(new LinkedList<>());
+
+
 
 
 

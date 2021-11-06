@@ -93,8 +93,11 @@ public class MqttCallbackImpl implements MqttCallback {
         synchronized (eventService){
             //eventService.setArrivedEvent( ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
           //  eventService.getArrivedQueueEvents().add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
-            ListIterator<Event> eventListIterator = eventService.getArrivedQueueEvents().listIterator();
-            eventListIterator.add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
+
+//            ListIterator<Event> eventListIterator = eventService.getArrivedQueueEvents().listIterator();
+//            eventListIterator.add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
+            eventService.getArrivedQueueEvents().add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
+
             eventService.setChanged(true);
            // System.out.println("EVENT Arrived:"+ eventService.getArrivedEvent());
         eventService.notify();

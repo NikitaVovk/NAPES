@@ -75,7 +75,7 @@ public class MqttCallbackImpl implements MqttCallback {
     public void clientPublish(String message){
         try {
             client.publish(Config.mqttTopic,new MqttMessage(message.getBytes()));
-            mainActivity.setText("\nMQTT/Message sent!", Color.RED);
+            mainActivity.setText("MQTT/Message sent!\n", Color.rgb(205,108,108));
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -107,7 +107,7 @@ public class MqttCallbackImpl implements MqttCallback {
 
       //  Config.fos.write(payload.getBytes());
         //textView.append("\n"+payload);
-        mainActivity.setText("\nMQTT message on topic: " + topic +" ... "+payload+"\n", 0xFF000000);
+        mainActivity.setText("MQTT message on topic: " + topic +" ... "+payload+"\n\n", Color.rgb(108,205,192));
         Log.d(TAG, payload);
 
     }

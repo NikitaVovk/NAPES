@@ -205,7 +205,8 @@ public class MainActivity extends AppCompatActivity  {
                 System.out.println("\n\n\n");
                 System.out.println(component);
 
-                 setText("\nComponent name : " + component.getcName(),0xFF000000);
+                 setText("########################################" +
+                         "\n#########################################\n#########################################\n \n             Component name : " + component.getcName()+"\n\n",0xFF000000);
             }
         }
     }
@@ -239,7 +240,7 @@ public class MainActivity extends AppCompatActivity  {
 //                textView.append(value);
 //
                 int start = textView.getText().length();
-                textView.append(value);
+                textView.append("#"+value);
                 int end = textView.getText().length();
                 Spannable spannableText = (Spannable) textView.getText();
                 spannableText.setSpan(new ForegroundColorSpan(color), start, end, 0);

@@ -33,7 +33,7 @@ public class ServiceFsm extends Thread {
         for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
             ServiceStates serviceStates = new ServiceStates(component,handler,eventService,stateMachine);
             serviceStates.setInitialStateForFSM();
-            handler.setText("\nSTARTING SIMULATING FSM: "+stateMachine.getmName()+"\n", Color.GREEN);
+            handler.setText("STARTING SIMULATING FSM: "+stateMachine.getmName()+"\n", Color.rgb(108,178,67));
             serviceStatesArrayList.add(serviceStates);
         }
         LinkedList<Event> eventLinkedList = null;

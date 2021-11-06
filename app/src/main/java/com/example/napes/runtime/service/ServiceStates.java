@@ -155,6 +155,7 @@ public class ServiceStates extends Thread{
 
                             currentState = getStateByName(stateMachine, currentTransition.getsName());
 
+                            handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state changed to: " + currentState.getsName()+"\n",Color.rgb(14,63,84));
 
                             sa.doActions(currentTransition.getActionList());
                             System.out.println("HERE 11111111222222 "+currentState.getOnEntry().getActionList());
@@ -167,7 +168,7 @@ public class ServiceStates extends Thread{
                             map.put(stateMachine.getmName(),currentState.getsName());
                         }
 
-                        handler.setText("Current state: " + currentState.getsName()+"\n",Color.MAGENTA);
+                      //  handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state changed to: " + currentState.getsName()+"\n",Color.rgb(14,63,84));
 
 
                     }

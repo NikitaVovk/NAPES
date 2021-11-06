@@ -205,8 +205,8 @@ public class MainActivity extends AppCompatActivity  {
                 System.out.println("\n\n\n");
                 System.out.println(component);
 
-                 setText("########################################" +
-                         "\n#########################################\n#########################################\n \n             Component name : " + component.getcName()+"\n\n",0xFF000000);
+                 setText("################################" +
+                         "\n#################################\n#################################\n \n             Component name : " + component.getcName()+"\n\n",0xFF000000);
             }
         }
     }

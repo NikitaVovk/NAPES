@@ -107,7 +107,7 @@ public class MqttCallbackImpl implements MqttCallback {
 
       //  Config.fos.write(payload.getBytes());
         //textView.append("\n"+payload);
-        mainActivity.setText("MQTT message on topic: " + topic +" ... "+payload+"\n\n", Color.rgb(108,205,192));
+        mainActivity.setText("MQTT message:\n@     Topic   >>>   " + topic +"\n@     Payload   >>>   "+payload+"\n\n", Color.rgb(51,38,38));
         Log.d(TAG, payload);
 
     }

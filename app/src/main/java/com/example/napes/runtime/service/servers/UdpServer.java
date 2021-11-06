@@ -54,7 +54,7 @@ public class UdpServer extends Thread {
                 int port = packet.getPort();
                 System.out.println("Request from: " + address + ":" + port);
                 System.out.println("Received data: "+ new String(packet.getData()));
-                handler.setText("UDP/Arrived message: "+ new String(packet.getData()), Color.GREEN);
+                handler.setText("UDP/Arrived message:\n@     PAYLOAD     >>>   \n "+ new String(packet.getData())+"\n", Color.rgb(15,129,11));
                 //   System.out.println(dString+" "+buf.length);
                 packet = new DatagramPacket(buf, buf.length, address, port);
                 socket.send(packet);

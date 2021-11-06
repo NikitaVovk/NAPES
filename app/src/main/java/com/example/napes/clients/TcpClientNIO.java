@@ -1,8 +1,10 @@
 package com.example.napes.clients;
 
+import android.graphics.Color;
 import android.os.Build;
 
 import com.example.napes.MainActivity;
+import com.example.napes.runtime.domains.flows.Flow;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -17,12 +19,14 @@ public class TcpClientNIO extends Thread{
     MainActivity handler;
     SocketChannel client;
     boolean isBinded;
+    Flow flow;
 
-    public void setMessage(String message) {
+    public void setParams(String message,Flow flow) {
         this.message = message;
+        this.flow= flow;
     }
 
-    public TcpClientNIO(String dstAddress, int dstPort, int localPort, MainActivity handler) {
+    public TcpClientNIO(String dstAddress, int dstPort, int localPort, MainActivity handler ) {
         this.dstAddress = dstAddress;
         this.dstPort = dstPort;
         this.localPort = localPort;
@@ -70,6 +74,7 @@ public class TcpClientNIO extends Thread{
         }
         //System.out.println(messages[i]);
         buffer.clear();
+        handler.setText("TCP/Sent successfully packet:\n@     Flow     >>>      {"+flow.getfType()+"}\n", Color.rgb(12,75,131));
     }
 
 

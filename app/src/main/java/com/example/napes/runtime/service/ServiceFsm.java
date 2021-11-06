@@ -20,6 +20,14 @@ public class ServiceFsm extends Thread {
     StateMachineList stateMachineList;
     ArrayList<ServiceStates> serviceStatesArrayList ;
 
+    public ArrayList<ServiceStates> getServiceStatesArrayList() {
+        return serviceStatesArrayList;
+    }
+
+    public void setServiceStatesArrayList(ArrayList<ServiceStates> serviceStatesArrayList) {
+        this.serviceStatesArrayList = serviceStatesArrayList;
+    }
+
     public ServiceFsm(EventService eventService, Component component, MainActivity handler, StateMachineList stateMachineList) {
         this.eventService = eventService;
         this.component = component;

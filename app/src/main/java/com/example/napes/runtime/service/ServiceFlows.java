@@ -78,7 +78,8 @@ while (true){
                         StaticClients.setUdpClient(new UdpClient(handler));
                         Config.udpPort = port.getClientInfo().getEndPoint().getPort();
                         Config.ipAddress = port.getClientInfo().getEndPoint().getIP();
-                        StaticClients.getUdpClient().setParams(map.get(stateMachine.getmName())+" time: "+currentFlow.getTimeParam());
+                        StaticClients.getUdpClient().setParams("{"+handler.getComponent().getcName()+"} --- {"+stateMachine.getmName()+"} --- {"+
+                                map.get(stateMachine.getmName())+"} --- {"+currentFlow.getfType()+"}",currentFlow);
                       //  System.out.println("CONFIGURING22222");
                         try {
                             Thread.currentThread().sleep(timeOut);
@@ -127,7 +128,8 @@ while (true){
 
                         //    tcpClient.setParams(map.get(stateMachine.getmName()));
 
-                            tcpClientNIO.setMessage(map.get(stateMachine.getmName()));
+                            tcpClientNIO.setParams("{"+handler.getComponent().getcName()+"} --- {"+stateMachine.getmName()+"} --- {"+
+                                    map.get(stateMachine.getmName())+"} --- {"+currentFlow.getfType()+"}",currentFlow);
 
                             try {
                                 Thread.currentThread().sleep(timeOut);

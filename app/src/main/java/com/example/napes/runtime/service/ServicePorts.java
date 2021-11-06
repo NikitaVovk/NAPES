@@ -68,7 +68,7 @@ public class ServicePorts extends Service {
     }
     private void startServer(String pTransport, int port){
         if (pTransport.equals("T")){
-            handler.setText("\nStarting TCP server on port"+port+"...\n", Color.BLACK);
+            handler.setText("TCP server started on   >>>   "+port+"\n............................................................", Color.rgb(12,75,131));
 //            TcpServer tcpServer = new TcpServer(port,handler);
 //            tcpServer.start();
             TcpServerNIO tcpServerNIO = new TcpServerNIO(handler,port);
@@ -76,7 +76,7 @@ public class ServicePorts extends Service {
 
         }
         else if (pTransport.equals("U")){
-            handler.setText("\nStarting UDP server on port"+port+"...\n", Color.BLACK);
+            handler.setText("UDP server started on   >>>   "+port+"\n............................................................", Color.rgb(15,129,11));
             udpServer = new UdpServer(port,handler);
             udpServer.start();
         }

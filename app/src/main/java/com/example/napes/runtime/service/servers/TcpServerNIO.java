@@ -45,7 +45,7 @@ public class TcpServerNIO extends Thread{
         serverChannel.socket().bind(listenAddress);
         serverChannel.register(this.selector, SelectionKey.OP_ACCEPT);
 
-        handler.setText("TCP server started on >> " + listenAddress, Color.RED);
+       // handler.setText("TCP server started on >> " + listenAddress, Color.RED);
         System.out.println("Server started on >> " + listenAddress);
 
         while (true) {
@@ -90,6 +90,7 @@ public class TcpServerNIO extends Thread{
         Socket socket = channel.socket();
         SocketAddress remoteAddr = socket.getRemoteSocketAddress();
         System.out.println("Connected to: " + remoteAddr);
+        handler.setText("TCP/Connected to: "+remoteAddr,Color.rgb(12,75,131));
 
         /*
          * Register channel with selector for further IO (record it for read/write
@@ -117,6 +118,6 @@ public class TcpServerNIO extends Thread{
         byte[] data = new byte[numRead];
         System.arraycopy(buffer.array(), 0, data, 0, numRead);
         System.out.println("Got: " + new String(data));
-        handler.setText("TCP/Arrived message: "+new String(data),Color.CYAN);
+        handler.setText("TCP/Arrived message:\n@     PAYLOAD     >>>     \n "+new String(data)+"\n",Color.rgb(12,75,131));
     }
 }

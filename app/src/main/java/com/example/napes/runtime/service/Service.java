@@ -47,9 +47,15 @@ public class Service {
 
         serviceFsm = new ServiceFsm(eventService,component,handler,component.getStateMachineList());
         serviceFsm.start();
+        try {
+            Thread.currentThread().sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
 
 //#################################################################################################
-//        ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>();
+        ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>(serviceFsm.getServiceStatesArrayList());
 //
 //        for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
 //            serviceStates = new ServiceStates(component,handler,eventService,stateMachine);
@@ -57,10 +63,10 @@ public class Service {
 //            //serviceFlows = new ServiceFlows(handler,serviceStates.map,stateMachine);
 //            serviceStates.start();
 //        }
-//        System.out.println("ArrayList<ServiceStates> serviceStatesArrayList: "+ serviceStatesArrayList);
-//        servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
+        System.out.println("ArrayList<ServiceStates> serviceStatesArrayList: "+serviceStatesArrayList );
+        servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
 
-      //  servicePorts.serviceServerPorts();
+       servicePorts.serviceServerPorts();
 
 
 

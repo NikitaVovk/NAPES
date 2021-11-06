@@ -64,7 +64,7 @@ public class SettingActivity extends AppCompatActivity {
 
                         StaticClients.getMqttCallback().setParams();
 
-                        StaticClients.getUdpClient().setParams("Test message");
+                       // StaticClients.getUdpClient().setParams("Test message");
                         StaticClients.getUdpClient().start();
                     }
                 }

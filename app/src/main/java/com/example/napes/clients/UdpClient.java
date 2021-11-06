@@ -5,6 +5,7 @@ import android.os.Message;
 
 import com.example.napes.MainActivity;
 import com.example.napes.config.Config;
+import com.example.napes.runtime.domains.flows.Flow;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -18,6 +19,7 @@ public class UdpClient extends Thread{
     String dstAddress,message="";
     int dstPort;
     private boolean running;
+    Flow flow;
 
 
     DatagramSocket socket;
@@ -29,11 +31,12 @@ public class UdpClient extends Thread{
         handler = mainActivity;
     }
 
-    public void setParams(String message) {
+    public void setParams(String message,Flow flow) {
 
         dstAddress = Config.ipAddress;
         this.message = message;
         dstPort = Config.udpPort;
+        this.flow = flow;
 
     }
 
@@ -68,7 +71,7 @@ public class UdpClient extends Thread{
             String line = new String(packet.getData(), 0, packet.getLength());
 
             System.out.println(line);
-            handler.setText("\nUDP/Arrived:"+ line+"\n", Color.GREEN);
+           handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Color.rgb(15,129,11));
 
         } catch (SocketException e) {
             e.printStackTrace();

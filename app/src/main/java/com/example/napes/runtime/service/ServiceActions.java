@@ -1,5 +1,6 @@
 package com.example.napes.runtime.service;
 
+import com.example.napes.MainActivity;
 import com.example.napes.clients.StaticClients;
 import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.events.Event;
@@ -11,14 +12,16 @@ import com.example.napes.runtime.domains.statemachine.states.State;
 public class ServiceActions {
     EventList eventList;
     EventService eventService;
+    MainActivity handler;
 
     public ServiceActions(EventList eventList) {
          this.eventList = eventList;
     }
 
-    public ServiceActions(EventList eventList, EventService eventService) {
+    public ServiceActions(EventList eventList, EventService eventService,  MainActivity handler) {
         this.eventList = eventList;
         this.eventService = eventService;
+        this.handler = handler;
     }
 
     public void doActions(ActionList actionList){
@@ -37,7 +40,7 @@ public class ServiceActions {
             if (event.geteType().equals("l")){
                 System.out.println("GENERUJ Z ACTIONS");
                 System.out.println("LOCAL ACTION");
-                ServiceLocalEvents serviceLocalEvents = new ServiceLocalEvents(event,eventService);
+                ServiceLocalEvents serviceLocalEvents = new ServiceLocalEvents(event,eventService,handler);
                 serviceLocalEvents.generateLocalEvent();
 
             }

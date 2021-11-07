@@ -6,6 +6,7 @@ import android.os.Message;
 import com.example.napes.MainActivity;
 import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.flows.Flow;
+import com.example.napes.runtime.service.payload.Colors;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -71,7 +72,7 @@ public class UdpClient extends Thread{
             String line = new String(packet.getData(), 0, packet.getLength());
 
             System.out.println(line);
-           handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Color.rgb(15,129,11));
+           handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
 
         } catch (SocketException e) {
             e.printStackTrace();

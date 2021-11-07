@@ -3,6 +3,7 @@ package com.example.napes.runtime.service.servers;
 import android.graphics.Color;
 
 import com.example.napes.MainActivity;
+import com.example.napes.runtime.service.payload.Colors;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -90,7 +91,7 @@ public class TcpServerNIO extends Thread{
         Socket socket = channel.socket();
         SocketAddress remoteAddr = socket.getRemoteSocketAddress();
         System.out.println("Connected to: " + remoteAddr);
-        handler.setText("TCP/Connected to: "+remoteAddr,Color.rgb(12,75,131));
+        handler.setText("TCP/Connected to: "+remoteAddr,Colors.tcpColor);
 
         /*
          * Register channel with selector for further IO (record it for read/write
@@ -118,6 +119,6 @@ public class TcpServerNIO extends Thread{
         byte[] data = new byte[numRead];
         System.arraycopy(buffer.array(), 0, data, 0, numRead);
         System.out.println("Got: " + new String(data));
-        handler.setText("TCP/Arrived message:\n@     PAYLOAD     >>>     \n "+new String(data)+"\n",Color.rgb(12,75,131));
+        handler.setText("TCP/Arrived message:\n@     PAYLOAD     >>>     \n "+new String(data)+"\n", Colors.tcpColor);
     }
 }

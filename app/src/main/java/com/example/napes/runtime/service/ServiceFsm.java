@@ -7,6 +7,7 @@ import com.example.napes.runtime.domains.component.Component;
 import com.example.napes.runtime.domains.events.Event;
 import com.example.napes.runtime.domains.statemachine.StateMachine;
 import com.example.napes.runtime.domains.statemachine.StateMachineList;
+import com.example.napes.runtime.service.payload.Colors;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -40,8 +41,13 @@ public class ServiceFsm extends Thread {
     public synchronized void  run() {
         for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
             ServiceStates serviceStates = new ServiceStates(component,handler,eventService,stateMachine);
+
+            handler.setText("STARTING SIMULATING FSM: "+stateMachine.getmName()+
+                    "\n........................................................................\n", Colors.localColor);
+
             serviceStates.setInitialStateForFSM();
-            handler.setText("STARTING SIMULATING FSM: "+stateMachine.getmName()+"\n", Color.rgb(108,178,67));
+
+
             serviceStatesArrayList.add(serviceStates);
         }
         LinkedList<Event> eventLinkedList = null;

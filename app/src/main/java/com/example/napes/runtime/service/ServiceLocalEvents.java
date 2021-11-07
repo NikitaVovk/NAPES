@@ -1,6 +1,8 @@
 package com.example.napes.runtime.service;
 
+import com.example.napes.MainActivity;
 import com.example.napes.runtime.domains.events.Event;
+import com.example.napes.runtime.service.payload.Colors;
 
 import java.util.ListIterator;
 
@@ -8,10 +10,12 @@ public class ServiceLocalEvents extends Thread{
 
     Event localEvent;
     EventService eventService;
+    MainActivity handler;
 
-    public ServiceLocalEvents(Event localEvent, EventService eventService) {
+    public ServiceLocalEvents(Event localEvent, EventService eventService, MainActivity handler) {
         this.localEvent = localEvent;
         this.eventService = eventService;
+        this.handler = handler;
     }
 
     public  void generateLocalEvent(){
@@ -23,6 +27,9 @@ public class ServiceLocalEvents extends Thread{
 
 
             try {
+                handler.setText("#Local/Local event starting ...\n" +
+                        "@     Event  >>>  "+localEvent.geteName()+
+                        "\n@     Time  >>>  "+localEvent.getTimeout()+" [s]\n", Colors.localColor);
                 System.out.println("WAITIIIIIIING................................................"+localEvent.geteName());
              //   eventService.wait();
                 Thread.sleep(localEvent.getTimeout()*1000);
@@ -40,5 +47,8 @@ public class ServiceLocalEvents extends Thread{
             eventService.notifyAll();
             System.out.println("IM WOKEN UP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+localEvent.geteName());
         }
+        handler.setText("#Local/Local event arrived ...\n" +
+                "@     Event  >>>  "+localEvent.geteName()+
+                "\n@     Time  >>>  "+localEvent.getTimeout()+" [s]\n", Colors.localColor);
     }
 }

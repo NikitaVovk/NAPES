@@ -10,6 +10,7 @@ import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.component.Component;
 import com.example.napes.runtime.domains.ports.Port;
 import com.example.napes.runtime.domains.ports.PortList;
+import com.example.napes.runtime.service.payload.Colors;
 import com.example.napes.runtime.service.servers.TcpServer;
 import com.example.napes.runtime.service.servers.TcpServerNIO;
 import com.example.napes.runtime.service.servers.UdpServer;
@@ -68,7 +69,7 @@ public class ServicePorts extends Service {
     }
     private void startServer(String pTransport, int port){
         if (pTransport.equals("T")){
-            handler.setText("TCP server started on   >>>   "+port+"\n............................................................", Color.rgb(12,75,131));
+            handler.setText("TCP server started on   >>>   "+port+"\n........................................................................\n", Colors.tcpColor);
 //            TcpServer tcpServer = new TcpServer(port,handler);
 //            tcpServer.start();
             TcpServerNIO tcpServerNIO = new TcpServerNIO(handler,port);
@@ -76,7 +77,7 @@ public class ServicePorts extends Service {
 
         }
         else if (pTransport.equals("U")){
-            handler.setText("UDP server started on   >>>   "+port+"\n............................................................", Color.rgb(15,129,11));
+            handler.setText("UDP server started on   >>>   "+port+"\n........................................................................\n", Colors.udpColor);
             udpServer = new UdpServer(port,handler);
             udpServer.start();
         }

@@ -4,6 +4,7 @@ package com.example.napes.runtime.service.servers;
 import android.graphics.Color;
 
 import com.example.napes.MainActivity;
+import com.example.napes.runtime.service.payload.Colors;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -54,7 +55,7 @@ public class UdpServer extends Thread {
                 int port = packet.getPort();
                 System.out.println("Request from: " + address + ":" + port);
                 System.out.println("Received data: "+ new String(packet.getData()));
-                handler.setText("UDP/Arrived message:\n@     PAYLOAD     >>>   \n "+ new String(packet.getData())+"\n", Color.rgb(15,129,11));
+                handler.setText("UDP/Arrived message:\n@     PAYLOAD     >>>   \n "+ new String(packet.getData())+"\n", Colors.udpColor);
                 //   System.out.println(dString+" "+buf.length);
                 packet = new DatagramPacket(buf, buf.length, address, port);
                 socket.send(packet);

@@ -11,6 +11,7 @@ import com.example.napes.runtime.domains.statemachine.StateMachine;
 import com.example.napes.runtime.domains.statemachine.StateMachineList;
 
 import com.example.napes.runtime.domains.statemachine.transitions.Transition;
+import com.example.napes.runtime.service.payload.Colors;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -64,10 +65,12 @@ public class ServiceStates extends Thread{
     public void setInitialStateForFSM(){
         map= new HashMap<String, String>();
          currentState = getInitialState(stateMachine);
-         sa = new ServiceActions(component.getEventList(),eventService);
+         sa = new ServiceActions(component.getEventList(),eventService,handler);
         sa.doActions(currentState.getOnEntry().getActionList());
         map.put(stateMachine.getmName(),currentState.getsName());
         tempEvents = new LinkedList<>();
+        handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Initial state: " + currentState.getsName()+"\n", Colors.stateColor);
+
 
     }
     public void setTempEvents(LinkedList<Event> events){
@@ -155,7 +158,7 @@ public class ServiceStates extends Thread{
 
                             currentState = getStateByName(stateMachine, currentTransition.getsName());
 
-                            handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state: " + currentState.getsName()+"\n",Color.rgb(14,63,84));
+                            handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state: " + currentState.getsName()+"\n",Colors.stateColor);
 
                             sa.doActions(currentTransition.getActionList());
                             System.out.println("HERE 11111111222222 "+currentState.getOnEntry().getActionList());

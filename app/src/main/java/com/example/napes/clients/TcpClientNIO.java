@@ -5,6 +5,7 @@ import android.os.Build;
 
 import com.example.napes.MainActivity;
 import com.example.napes.runtime.domains.flows.Flow;
+import com.example.napes.runtime.service.payload.Colors;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -74,7 +75,7 @@ public class TcpClientNIO extends Thread{
         }
         //System.out.println(messages[i]);
         buffer.clear();
-        handler.setText("TCP/Sent successfully packet:\n@     Flow     >>>      {"+flow.getfType()+"}\n", Color.rgb(12,75,131));
+        handler.setText("TCP/Sent successfully packet:\n@     Flow     >>>      {"+flow.getfType()+"}\n", Colors.tcpColor);
     }
 
 

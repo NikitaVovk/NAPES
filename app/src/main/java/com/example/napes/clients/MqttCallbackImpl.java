@@ -9,6 +9,7 @@ import com.example.napes.runtime.domains.events.Event;
 import com.example.napes.runtime.service.EventService;
 import com.example.napes.runtime.service.Service;
 import com.example.napes.runtime.service.ServiceStates;
+import com.example.napes.runtime.service.payload.Colors;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
@@ -75,7 +76,7 @@ public class MqttCallbackImpl implements MqttCallback {
     public void clientPublish(String message){
         try {
             client.publish(Config.mqttTopic,new MqttMessage(message.getBytes()));
-            mainActivity.setText("MQTT/Message sent!\n", Color.rgb(205,108,108));
+            mainActivity.setText("MQTT/Message sent!\n", Colors.mqttColor);
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -107,7 +108,7 @@ public class MqttCallbackImpl implements MqttCallback {
 
       //  Config.fos.write(payload.getBytes());
         //textView.append("\n"+payload);
-        mainActivity.setText("MQTT message:\n@     Topic   >>>   " + topic +"\n@     Payload   >>>   "+payload+"\n\n", Color.rgb(51,38,38));
+        mainActivity.setText("MQTT message:\n@     Topic   >>>   " + topic +"\n@     Payload   >>>   "+payload+"\n\n",Colors.mqttColor);
         Log.d(TAG, payload);
 
     }

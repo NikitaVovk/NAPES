@@ -28,6 +28,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,6 +46,7 @@ import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.component.Component;
 import com.example.napes.runtime.parser.MainParser;
 import com.example.napes.runtime.service.Service;
+import com.example.napes.runtime.service.payload.Colors;
 
 import java.io.FileNotFoundException;
 
@@ -58,6 +60,7 @@ public class MainActivity extends AppCompatActivity  {
     private Button settingButton, sendButton, startButton;
     RadioGroup radioGroup;
     RadioButton radioButton;
+    boolean textViewFlag;
 
     private Service service;
     private Component component;
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity  {
 
         textView = (TextView)findViewById(R.id.textViewMqtt);
         textView.setMovementMethod(new ScrollingMovementMethod());
+        textViewFlag = true;
         //MqttCallbackImpl mqttCallback = new MqttCallbackImpl(this);
         addListenerOnButton();
     }
@@ -165,6 +169,32 @@ public class MainActivity extends AppCompatActivity  {
                     }
                 }
         );
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                                System.out.println("########## U  touch MY TRALALA   ##########"+ textView);
+
+                if (textViewFlag)
+                    textViewFlag = false;
+                else
+                    textViewFlag = true;
+
+            }
+        });
+    //    textView.setOnTouchListener(new View.OnTouchListener() {
+//            @SuppressLint("ClickableViewAccessibility")
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                System.out.println("########## U  touch MY TRALALA   ##########");
+//
+//                if (textViewFlag)
+//                    textViewFlag = false;
+//                else
+//                    textViewFlag = true;
+//                return false;
+//            }
+     //   });
+
     }
     private void performFileSearch(){
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -206,7 +236,7 @@ public class MainActivity extends AppCompatActivity  {
                 System.out.println(component);
 
                  setText("################################" +
-                         "\n#################################\n#################################\n \n             Component name : " + component.getcName()+"\n\n",0xFF000000);
+                         "\n#################################\n#################################\n \n  >  Component name : " + component.getcName()+"\n\n", Colors.localColor);
             }
         }
     }
@@ -254,12 +284,16 @@ public class MainActivity extends AppCompatActivity  {
 //                            + textView.getPaddingBottom() - textView.getBottom() + textView.getTop();
                     final int scrollAmount = textView.getLayout().getLineTop(textView.getLineCount()) - textView.getHeight();
 
-                    if (scrollAmount > 0) {
+                    if (scrollAmount > 0 && textViewFlag) {
 //                        System.out.println("GETSCROLL Y "+scrollAmount );
-                        textView.setGravity(Gravity.BOTTOM);
+
+                        textView.setGravity(Gravity.BOTTOM);//
+
                       //  textView.scrollBy(0, scrollAmount);
                     } else {
-                        textView.scrollTo(0, 0);
+                        System.out.println("CLICK LICK  CLICK LICK!################################################");
+                        textView.setGravity(Gravity.NO_GRAVITY);
+                       // textView.scrollTo(0, 0);
                     }
 
                     //textView.scrollTo(textView.getScrollX(),textView.getScrollY());

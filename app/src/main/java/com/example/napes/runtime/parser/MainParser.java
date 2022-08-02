@@ -2,12 +2,14 @@ package com.example.napes.runtime.parser;
 
 
 
+import android.net.Uri;
 import android.os.Environment;
 
 import com.example.napes.runtime.domains.component.Component;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Scanner;
 
@@ -19,10 +21,18 @@ public class MainParser {
 
     public MainParser(String filePath) throws FileNotFoundException {
         File file = Environment.getExternalStorageDirectory();
-        System.out.println("ABSOLUTE PATH: !!!!"+file.getAbsolutePath()+"/Documents/"+filePath);
+        System.out.println("ABSOLUTE PATH: !!!!"+Environment.getExternalStorageState()+"/Documents/"+filePath);
+        System.out.println("ABSOLUTE PATH: !!!!"+file.getAbsolutePath()+"/"+filePath);
+
+
         Scanner scanner;
-      //  scanner = new Scanner(new File(file.getAbsolutePath()+"/Documents/"+filePath));
-        scanner = new Scanner(new File(filePath));
+       // scanner = new Scanner(new File(file.getAbsolutePath()+"/Documents/"+filePath)); //sanya
+       //scanner = new Scanner(new File(file.getAbsolutePath()+"/"+filePath));   //nastya
+        scanner = new Scanner(new File(filePath));   //my samsung bought
+
+       // scanner = new Scanner(new File("/storage/emulated/0/Download/testowySerwer(kilkaFSM).rcr"));   //my
+
+       // scanner = new Scanner(new File(filePath)); //emulator
         scanner.useDelimiter("");
 
 

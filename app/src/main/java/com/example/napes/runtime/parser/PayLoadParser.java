@@ -43,4 +43,11 @@ public class PayLoadParser {
         flow.setUnit(textToDivide.replaceAll("[^a-z]", ""));
 
     }
+
+    public static void setRealTimeDelay (Flow flow){
+        if (flow.getUnit().equals("ms"))
+            flow.setRealTimeDelay(flow.getTimeParam());
+        else
+            flow.setRealTimeDelay(flow.getTimeParam()*1000);
+    }
 }

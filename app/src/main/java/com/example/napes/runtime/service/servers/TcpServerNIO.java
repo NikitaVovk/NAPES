@@ -1,10 +1,13 @@
 package com.example.napes.runtime.service.servers;
 
 import android.graphics.Color;
+import android.os.Environment;
 
 import com.example.napes.MainActivity;
 import com.example.napes.runtime.service.payload.Colors;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -24,6 +27,8 @@ public class TcpServerNIO extends Thread{
     //private final static int PORT = 5000;
     MainActivity handler;
 
+    long realTime;
+
 
     public TcpServerNIO(MainActivity handler, int port) {
         this.handler = handler;
@@ -37,6 +42,7 @@ public class TcpServerNIO extends Thread{
      */
     @Override
     public void run()  {
+        realTime = System.currentTimeMillis();
         try{
         this.selector = Selector.open();
         ServerSocketChannel serverChannel = ServerSocketChannel.open();
@@ -55,6 +61,7 @@ public class TcpServerNIO extends Thread{
             if (readyCount == 0) {
                 continue;
             }
+
 
             // process selected keys...
             Set<SelectionKey> readyKeys = selector.selectedKeys();
@@ -119,6 +126,18 @@ public class TcpServerNIO extends Thread{
         byte[] data = new byte[numRead];
         System.arraycopy(buffer.array(), 0, data, 0, numRead);
         System.out.println("Got: " + new String(data));
+        realTime = System.currentTimeMillis() - realTime;
+        System.out.println("REAL TIME TCP :::::::::::::: "+ realTime);
+        realTime = System.currentTimeMillis();
+//        File file = Environment.getExternalStorageDirectory();
+//        File fileToWrite= new File(file.getAbsolutePath()+"/documents", "wynik.txt");
+//
+//        FileOutputStream stream = new FileOutputStream(fileToWrite);
+//        try {
+//            stream.write("text-to-write".getBytes());
+//        } finally {
+//            stream.close();
+//        }
         handler.setText("TCP/Arrived message:\n@     PAYLOAD     >>>     \n "+new String(data)+"\n", Colors.tcpColor);
     }
 }

@@ -23,47 +23,51 @@ import java.util.Date;
 
 public class Service {
 
-     EventService eventService;
-     ServiceFsm serviceFsm;
-     ServicePorts servicePorts;
-     ServiceFlows serviceFlows;
-    Component component;
-    MainActivity handler;
-    public static UdpServer udpServer;
-    public  ServiceStates serviceStates;
+     EventService eventService;         //obiekt uruchamiający wątek obsługi zdarzeń
+     ServiceFsm serviceFsm;             //obiekt uruchamiający wątek obsługi maszyny stanów
+     ServicePorts servicePorts;         //obiekt uruchamiający wątek obsługi portów
+     ServiceFlows serviceFlows;         //obiekt uruchamiający wątek obsługi przepływów
+    Component component;                //obiekt zawierający dane komponentu
+    MainActivity handler;               //wskaźnik do interfejsu użytkownika (dla wyświetlenia logów)
+    public static UdpServer udpServer;  //obiekt serwera UDP
+    public  ServiceStates serviceStates;//obiekt uruchamiający wątek obsługi stanów
 
-    public Service(Component component,MainActivity mainActivity) {
+    public Service(Component component,MainActivity mainActivity) { //konstruktor klasy
         this.component = component;
         this.handler = mainActivity;
 
     }
 
+    public  void serviceMain(){         //metoda zaczynająca emulację
 
-    public  void serviceMain(){
+        //Ustawienia parametrów oraz uruchamianie innych wątków obsługi
 
         Config.ipAddressBroker= component.getMqttBroker().getEndPointDefp().getIP();
         eventService = new EventService(handler);
-        eventService.startMqttClient();
+        eventService.startMqttClient(); // Start klienta MQTT
 
         serviceFsm = new ServiceFsm(eventService,component,handler,component.getStateMachineList());
-        serviceFsm.start();
+        serviceFsm.start();             // Start zarządzania maszynami stanów
+
         try {
             Thread.currentThread().sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>(serviceFsm.
+                getServiceStatesArrayList()); // Pobranie zsynchronizowanych danych
 
-//#################################################################################################
-        ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>(serviceFsm.getServiceStatesArrayList());
-//
+        //
 //        for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
 //            serviceStates = new ServiceStates(component,handler,eventService,stateMachine);
 //            serviceStatesArrayList.add(serviceStates);
 //            //serviceFlows = new ServiceFlows(handler,serviceStates.map,stateMachine);
 //            serviceStates.start();
 //        }
+
         System.out.println("ArrayList<ServiceStates> serviceStatesArrayList: "+serviceStatesArrayList );
+        // Start obsługi portów
         servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
 
        servicePorts.serviceServerPorts();
@@ -71,6 +75,10 @@ public class Service {
 
 
     }
+
+
+
+
 
     public EventService getEventService() {
         return eventService;

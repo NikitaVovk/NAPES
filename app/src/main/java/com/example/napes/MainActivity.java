@@ -14,14 +14,17 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.method.ScrollingMovementMethod;
@@ -45,15 +48,26 @@ import com.example.napes.clients.UdpClient;
 import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.component.Component;
 import com.example.napes.runtime.parser.MainParser;
+import com.example.napes.runtime.payloads.FileUtils;
+
 import com.example.napes.runtime.service.Service;
 import com.example.napes.runtime.service.payload.Colors;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.net.URISyntaxException;
 
 public class MainActivity extends AppCompatActivity  {
 
     private static final int READ_REQUEST_CODE = 42;
     private static final int PERMISSION_REQUEST_STORAGE = 1000;
+    private static final int CREATE_REQUEST_CODE = 40;
+    private static final int OPEN_REQUEST_CODE = 41;
+    private static final int SAVE_REQUEST_CODE = 42;
 
     private  TextView textView;
     private EditText messageText;
@@ -61,6 +75,7 @@ public class MainActivity extends AppCompatActivity  {
     RadioGroup radioGroup;
     RadioButton radioButton;
     boolean textViewFlag;
+    FileOutputStream fOut ;
 
     private Service service;
     private Component component;
@@ -87,6 +102,47 @@ public class MainActivity extends AppCompatActivity  {
                 checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!=PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},PERMISSION_REQUEST_STORAGE);
         }
+
+
+
+
+
+
+
+//        File file = new File("append.txt");
+//        FileWriter fr = null;
+//
+//        try {
+//            file.createNewFile(); // if file already exists will do nothing
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        //  FileOutputStream oFile = new FileOutputStream(yourFile, false);
+//
+//        try {
+//            System.out.println("###########: !MAYBE SAVED ");
+//            fr = new FileWriter(file, true);
+//            fr.write("data");
+//            fr.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//######################################################################################
+
+
+
+//        try {
+//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput("logs.txt", Context.MODE_APPEND));
+//            outputStreamWriter.write("data");
+//            outputStreamWriter.close();
+//            System.out.println("######## DONE");
+//        }
+//        catch (IOException e) {
+//            Log.e("Exception", "File write failed: " + e.toString());
+//        }
+
+
+
 
         textView = (TextView)findViewById(R.id.textViewMqtt);
         textView.setMovementMethod(new ScrollingMovementMethod());
@@ -162,8 +218,8 @@ public class MainActivity extends AppCompatActivity  {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(".SettingActivity");
-
-                        startActivity(intent);
+                        saveFile();
+//                        startActivity(intent);
 
 
                     }
@@ -172,7 +228,7 @@ public class MainActivity extends AppCompatActivity  {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                                System.out.println("########## U  touch MY TRALALA   ##########"+ textView);
+                                System.out.println("########## U  touch MY TRALALA   ##########"+ textViewFlag);
 
                 if (textViewFlag)
                     textViewFlag = false;
@@ -203,7 +259,16 @@ public class MainActivity extends AppCompatActivity  {
 
 
         startActivityForResult(intent, READ_REQUEST_CODE);
+        //startActivityForResult(intent, READ_REQUEST_CODE);
 
+    }
+    public void saveFile()
+    {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("text/plain");
+
+        startActivityForResult(intent, SAVE_REQUEST_CODE);
     }
 
 
@@ -216,6 +281,13 @@ public class MainActivity extends AppCompatActivity  {
             if (data!=null){
                 System.out.println("DATAAA: "+data.getDataString());
                 Uri uri = data.getData();
+
+                    String filePath = new FileUtils(getApplicationContext()).getPath(uri);
+                    System.out.println("MYY NEW PATHHH: ++++++++++++++++++++++++ "+ filePath);
+
+
+
+
                 String path = uri.getPath();
                 System.out.println("URI+: "+ uri.getEncodedAuthority()+"   PATH:"+ path);
                 path = path.substring(path.indexOf(":")+1);
@@ -227,7 +299,8 @@ public class MainActivity extends AppCompatActivity  {
                 MainParser mainParser = null;
                 System.out.println("\n\n\n\nPATH!!!: "+path);
                 try {
-                    mainParser = new MainParser(path);
+                    mainParser = new MainParser(filePath);
+
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -239,7 +312,34 @@ public class MainActivity extends AppCompatActivity  {
                          "\n#################################\n#################################\n \n  >  Component name : " + component.getcName()+"\n\n", Colors.localColor);
             }
         }
+
+        if (resultCode == Activity.RESULT_OK)
+        {
+            if (requestCode == CREATE_REQUEST_CODE)
+            {
+                if (data != null) {
+                    textView.setText("");
+                }
+            } else if (requestCode == SAVE_REQUEST_CODE) {
+
+                if (data != null) {
+                            try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput("logs.txt", Context.MODE_APPEND));
+            outputStreamWriter.write("data");
+            outputStreamWriter.close();
+            System.out.println("######## DONE");
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+
+                    // currentUri = resultData.getData();
+                  //  writeFileContent(currentUri);
+                }
+            }
+        }
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

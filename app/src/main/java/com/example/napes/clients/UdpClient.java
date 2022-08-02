@@ -8,6 +8,9 @@ import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.flows.Flow;
 import com.example.napes.runtime.service.payload.Colors;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -62,18 +65,50 @@ public class UdpClient extends Thread{
             buf = message.getBytes();
 
             DatagramPacket packet =
-                    new DatagramPacket(buf, buf.length, address, dstPort);
+                    new DatagramPacket(buf, buf.length, address, dstPort);//dstPort);
 
             socket.send(packet);
+            String sentTime = (Long.toString(System.currentTimeMillis()));
             buf = new byte[256];
             // get response
             packet = new DatagramPacket(buf, buf.length);
             socket.receive(packet);
             String line = new String(packet.getData(), 0, packet.getLength());
 
-            System.out.println(line);
-           handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
+            synchronized (handler) {
+                FileOutputStream fOut = null;
+                System.out.println(line);
+                // handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
 
+                System.out.println("############: DIRECTORY:" + handler.getApplicationContext().getFilesDir());
+                try {
+                    // openFileInput()
+                    // fOut = openFileOutput("savedData.txt",  MODE_APPEND);
+                    fOut = new FileOutputStream(new File(handler.getApplicationContext().getFilesDir(), "logs2.txt"), true);
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+
+                    fOut.write((sentTime + "\n").getBytes());
+
+                    //System.out.println("###########: !MAYBE SAVED ");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (fOut != null) {
+                        try {
+                            fOut.close();
+                            //System.out.println("CLOSEEEEE");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+            }
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {

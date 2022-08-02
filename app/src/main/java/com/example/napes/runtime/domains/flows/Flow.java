@@ -6,6 +6,15 @@ public class Flow {
     int timeParam;
     int fParametr;
     String unit;
+    long realTimeDelay;
+
+    public long getRealTimeDelay() {
+        return realTimeDelay;
+    }
+
+    public void setRealTimeDelay(long realTimeDelay) {
+        this.realTimeDelay = realTimeDelay;
+    }
 
     public String getfName() {
         return fName;

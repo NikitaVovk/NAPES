@@ -22,6 +22,7 @@ public class ServiceFlows extends Thread {
     Map<String,String> map;
     StateMachine stateMachine;
     FlowList flowList;
+    long realClientTimeTCP;
 
     public ServiceFlows(Port port, MainActivity handler, Map<String, String> map,StateMachine stateMachine, FlowList flowList) {
         super("ServiceFlow");
@@ -57,6 +58,7 @@ public class ServiceFlows extends Thread {
 
     @Override
     public void run() {
+        //CHECK HASHMAP ::: IF IT CHANGES
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -70,8 +72,9 @@ while (true){
                 if (map.get(stateMachine.getmName()).equals(stateFlow.getsName())){
                     while(map.get(stateMachine.getmName()).equals(stateFlow.getsName())) {
                         Flow currentFlow = getCurrentFlow(stateFlow);
-                        long timeOut = currentFlow.getTimeParam();
-                        timeOut*=1000;
+                        long timeOut = currentFlow.getRealTimeDelay();
+
+                        //timeOut*=1000;
 
 
                         //System.out.println("CONFIGURING...");
@@ -81,12 +84,20 @@ while (true){
                         StaticClients.getUdpClient().setParams("{"+handler.getComponent().getcName()+"} --- {"+stateMachine.getmName()+"} --- {"+
                                 map.get(stateMachine.getmName())+"} --- {"+currentFlow.getfType()+"}",currentFlow);
                       //  System.out.println("CONFIGURING22222");
-                        try {
-                            Thread.currentThread().sleep(timeOut);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
+//                        try {
+//                            Thread.currentThread().sleep(timeOut); //its better to wait (long timeout) and notify when state changes in State fsm
+//                            //object for synchronization will be hashmap which is idential for each fsm
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
                         StaticClients.getUdpClient().start();
+                        synchronized (map){
+                            try {
+                                map.wait(timeOut);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
 
 
@@ -103,6 +114,7 @@ while (true){
 
             System.out.println("MAP IN SERVICE FLOW:"+map);
             while (true){
+
 //                Config.tcpPort = port.getClientInfo().getEndPoint().getPort();
 //                Config.ipAddressTcp = port.getClientInfo().getEndPoint().getIP();
 //                System.out.println("HEREEEEEEE"+Config.ipAddressTcp+Config.tcpPort );
@@ -114,10 +126,12 @@ while (true){
                     if (map.get(stateMachine.getmName()).equals(stateFlow.getsName())){
                         while(map.get(stateMachine.getmName()).equals(stateFlow.getsName())) {
 
+                            realClientTimeTCP= System.currentTimeMillis();
+
                             Flow currentFlow = getCurrentFlow(stateFlow);
-                            long timeOut = currentFlow.getTimeParam();
+                            long timeOut = currentFlow.getRealTimeDelay();
 //                            long timeOut = stateFlow.getAnonFlow().getFlows().get(0).getTimeParam();
-                            timeOut*=1000;
+                           // timeOut*=1000;
 
 
                             System.out.println("CONFIGURING..."+map.get(stateMachine.getmName()));
@@ -131,12 +145,23 @@ while (true){
                             tcpClientNIO.setParams("{"+handler.getComponent().getcName()+"} --- {"+stateMachine.getmName()+"} --- {"+
                                     map.get(stateMachine.getmName())+"} --- {"+currentFlow.getfType()+"}",currentFlow);
 
-                            try {
-                                Thread.currentThread().sleep(timeOut);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
+//                            try {
+//                                Thread.currentThread().sleep(timeOut);
+//                            } catch (InterruptedException e) {
+//                                e.printStackTrace();
+//                            }
+
                             tcpClientNIO.run();
+                            synchronized (map){
+                                try {
+                                    map.wait(timeOut);
+                                    realClientTimeTCP = System.currentTimeMillis() - realClientTimeTCP;
+                                    System.out.println("REAL TIME CLIENT TCP :::::::: "+ realClientTimeTCP);
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                           //  tcpClient.run();
                             //StaticClients.getTcpClient().start();
                            // StaticClients.setTcpClient(null);

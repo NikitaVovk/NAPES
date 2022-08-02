@@ -40,6 +40,7 @@ public class FlowParser extends PayLoadParser{
 
         flow.setfType(readTillTo('{',';'));
         divideParamUnit(flow,readTillTo(';',';'));
+        setRealTimeDelay(flow);
         flow.setfParametr(Integer.parseInt(readTillTo(';','}')));
         linkedList.pop();
         return flow;
@@ -49,6 +50,7 @@ public class FlowParser extends PayLoadParser{
 
         flow.setfType(readTillTo('{',';'));
         divideParamUnit(flow,readTillTo(';',';'));
+        setRealTimeDelay(flow);
         flow.setfParametr(Integer.parseInt(readTillTo(';','}')));
         linkedList.pop();
         return flow;

@@ -19,6 +19,7 @@ public class UdpServer extends Thread {
     protected DatagramSocket socket = null;
     private MainActivity handler;
     //public static final String SERVERIP = "127.0.0.1";
+    long realTime;
 
 
     public UdpServer(int serverport, MainActivity mainActivity)  {
@@ -43,8 +44,13 @@ public class UdpServer extends Thread {
                 byte[] buf = new byte[1024];
 
                 // receive request
+                realTime = System.currentTimeMillis();
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
+
+                realTime = System.currentTimeMillis() - realTime;
+                System.out.println("REAL TIME UDP :::::::::::::: "+ realTime);
+                realTime = System.currentTimeMillis();
 
                 String dString = "OK "+new Date().toString();
 

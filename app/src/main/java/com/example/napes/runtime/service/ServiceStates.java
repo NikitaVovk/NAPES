@@ -169,6 +169,10 @@ public class ServiceStates extends Thread{
 
                             //do on entry action on currentState  and   transition actions
                             map.put(stateMachine.getmName(),currentState.getsName());
+                            synchronized (map){
+                                map.notifyAll();
+                            }
+
                         }
 
                       //  handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state changed to: " + currentState.getsName()+"\n",Color.rgb(14,63,84));

@@ -69,8 +69,8 @@ public class TcpClientNIO extends Thread{
     @Override
     public void run(){
         String sentTime = null;
-        ByteBuffer buffer = ByteBuffer.allocate(74);
-        buffer.put(message.getBytes());
+        ByteBuffer buffer = ByteBuffer.allocate(flow.getfParametr());
+       // buffer.put(message.getBytes());
         buffer.flip();
         try {
             client.write(buffer);

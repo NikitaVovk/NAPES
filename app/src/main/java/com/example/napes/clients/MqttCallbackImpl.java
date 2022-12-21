@@ -21,6 +21,7 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.ListIterator;
 
 public class MqttCallbackImpl implements MqttCallback {
@@ -72,6 +73,18 @@ public class MqttCallbackImpl implements MqttCallback {
         }
     }
 
+    public boolean disConnect() {
+        try {
+
+            client.disconnect();
+
+
+            return true;
+        } catch (MqttException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public void clientPublish(String message){
         try {
@@ -108,6 +121,14 @@ public class MqttCallbackImpl implements MqttCallback {
 
       //  Config.fos.write(payload.getBytes());
         //textView.append("\n"+payload);
+        String currentTime = (Long.toString(System.currentTimeMillis()));
+        String end = (Long.toString(System.currentTimeMillis()+1000L));
+        mainActivity.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                ",\"ph\":\"n\",\"cat\":\"service_events\",\"name\":\""+"MQTT: "+topic
+                +"\",\"id\": 1,\"args\":{}},",mainActivity);
+//        mainActivity.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+end+
+//                ",\"ph\":\"e\",\"cat\":\"service_events\",\"name\":\""+"MQTT: "+topic
+//                +"\",\"id\": 1,\"args\":{}},",mainActivity);
         mainActivity.setText("MQTT message:\n@     Topic   >>>   " + topic +"\n@     Payload   >>>   "+payload+"\n\n",Colors.mqttColor);
         Log.d(TAG, payload);
 

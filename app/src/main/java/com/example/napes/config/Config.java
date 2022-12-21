@@ -9,7 +9,9 @@ public class Config {
     public  static String ipAddress = "192.168.1.4";
     public  static String ipAddressTcp = "192.168.1.4";
 
-    public  static String ipAddressBroker = "192.168.1.178";
+    public  static String ipAddressBroker = "192.168.1.217";
+
+    public  static boolean simulating = false;
 
     //MQTT
     public  static int mqttPort = 1883;

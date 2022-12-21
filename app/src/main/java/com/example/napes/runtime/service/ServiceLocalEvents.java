@@ -30,6 +30,12 @@ public class ServiceLocalEvents extends Thread{
                 handler.setText("#Local/Local event starting ...\n" +
                         "@     Event  >>>  "+localEvent.geteName()+
                         "\n@     Time  >>>  "+localEvent.getTimeout()+" [s]\n", Colors.localColor);
+
+                String currentTime = (Long.toString(System.currentTimeMillis()));
+                handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                        ",\"ph\":\"b\",\"cat\":\"service_events\",\"name\":\""+localEvent.geteName()
+                        +"\",\"id\": 1,\"args\":{}},",handler);
+
                 System.out.println("WAITIIIIIIING................................................"+localEvent.geteName());
              //   eventService.wait();
                 Thread.sleep(localEvent.getTimeout()*1000);
@@ -47,6 +53,10 @@ public class ServiceLocalEvents extends Thread{
             eventService.notifyAll();
             System.out.println("IM WOKEN UP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+localEvent.geteName());
         }
+        String currentTime = (Long.toString(System.currentTimeMillis()));
+        handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                ",\"ph\":\"e\",\"cat\":\"service_events\",\"name\":\""+localEvent.geteName()
+                +"\",\"id\": 1,\"args\":{}},",handler);
         handler.setText("#Local/Local event arrived ...\n" +
                 "@     Event  >>>  "+localEvent.geteName()+
                 "\n@     Time  >>>  "+localEvent.getTimeout()+" [s]\n", Colors.localColor);

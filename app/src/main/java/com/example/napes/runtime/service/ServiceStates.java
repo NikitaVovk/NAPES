@@ -65,11 +65,25 @@ public class ServiceStates extends Thread{
     public void setInitialStateForFSM(){
         map= new HashMap<String, String>();
          currentState = getInitialState(stateMachine);
+
+        String currentTime = (Long.toString(System.currentTimeMillis()));
+//        handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+",\"ph\":\"B\",\"cat\":\"service_states1\",\"name\":\""+
+//                currentState.getsName()
+//                +"\",\"args\":{}},",handler);
+
+        handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                ",\"ph\":\"b\",\"cat\":\"service_states\",\"name\":\""+this.getStateMachine().getmName()
+                +"\",\"id\": 1,\"args\":{}},",handler);
+        handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                ",\"ph\":\"b\",\"cat\":\"service_states\",\"name\":\""+currentState.getsName()
+                +"\",\"id\": 1,\"args\":{}},",handler);
+
          sa = new ServiceActions(component.getEventList(),eventService,handler);
         sa.doActions(currentState.getOnEntry().getActionList());
         map.put(stateMachine.getmName(),currentState.getsName());
         tempEvents = new LinkedList<>();
         handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Initial state: " + currentState.getsName()+"\n", Colors.stateColor);
+
 
 
     }
@@ -156,7 +170,18 @@ public class ServiceStates extends Thread{
                             //serviceActions = new ServiceActions(component.getEventList());
                             sa.doActions(currentState.getOnExit().getActionList());
 
+                            String currentTimeEnd = (Long.toString(System.currentTimeMillis()));
+                            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTimeEnd+
+                                    ",\"ph\":\"e\",\"cat\":\"service_states\",\"name\":\""+currentState.getsName()
+                                    +"\",\"id\": 1,\"args\":{}},",handler);
+
                             currentState = getStateByName(stateMachine, currentTransition.getsName());
+
+                            String currentTime = (Long.toString(System.currentTimeMillis()));
+                            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                                    ",\"ph\":\"b\",\"cat\":\"service_states\",\"name\":\""+currentState.getsName()
+                                    +"\",\"id\": 1,\"args\":{}},",handler);
+
 
                             handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state: " + currentState.getsName()+"\n",Colors.stateColor);
 

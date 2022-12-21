@@ -3,6 +3,7 @@ package com.example.napes.runtime.service;
 import android.graphics.Color;
 
 import com.example.napes.MainActivity;
+import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.component.Component;
 import com.example.napes.runtime.domains.events.Event;
 import com.example.napes.runtime.domains.statemachine.StateMachine;
@@ -55,7 +56,9 @@ public class ServiceFsm extends Thread {
 //            ss.setInitialStateForFSM();
 //            // ss.setTempEvents(new LinkedList<>(eventService.getArrivedQueueEvents()));
 //        }
-                    while(true){
+
+        while(true&& Config.simulating){
+                //    while(true){ zmiana 20_12_22
 
 
 

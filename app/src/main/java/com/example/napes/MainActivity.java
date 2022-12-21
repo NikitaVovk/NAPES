@@ -2,7 +2,9 @@ package com.example.napes;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
@@ -24,6 +26,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.Layout;
 import android.text.Spannable;
@@ -103,7 +106,9 @@ public class MainActivity extends AppCompatActivity  {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},PERMISSION_REQUEST_STORAGE);
         }
 
+        verifyStoragePermissions(this);
 
+        //addLogTime("kyyy",this);
 
 
 
@@ -167,7 +172,7 @@ public class MainActivity extends AppCompatActivity  {
       //  if (StaticClients.getMqttCallback()==null)
 //        StaticClients.setMqttCallback(new MqttCallbackImpl(this));
 
-        StaticClients.setUdpClient(new UdpClient(this));
+        StaticClients.setUdpClient(new UdpClient(this,true));
 
         startButton.setOnClickListener(
                 new View.OnClickListener() {
@@ -402,6 +407,122 @@ public class MainActivity extends AppCompatActivity  {
         });
     }
 
+    public  void addLog(final String value, MainActivity handler){
 
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (handler) {
+                    FileOutputStream fOut = null;
+
+                    // handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
+
+                    System.out.println("############: DIRECTORY:" + handler.getApplicationContext().getFilesDir());
+                    try {
+                        // openFileInput()
+                        // fOut = openFileOutput("savedData.txt",  MODE_APPEND);
+                        fOut = new FileOutputStream(new File(handler.getApplicationContext().getFilesDir(), "logs.json"), true);
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+
+                        fOut.write((value + "\n").getBytes());
+
+                        //System.out.println("###########: !MAYBE SAVED ");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (fOut != null) {
+                            try {
+                                fOut.close();
+                                //System.out.println("CLOSEEEEE");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                }
+            }
+        });
+    }
+
+    public  void addLogTime(final String value, MainActivity handler, String fileName){
+
+        runOnUiThread(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void run() {
+                synchronized (handler) {
+                    FileOutputStream fOut = null;
+
+                    // handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
+                    File file = Environment.getExternalStorageDirectory();
+                    System.out.println("############: DIRECTORY:" + handler.getApplicationContext().getFilesDir());
+                    System.out.println("############: DIRECTORY:" +file.getAbsolutePath()+Environment.DIRECTORY_DOWNLOADS+"/time.txt" );
+
+                    try {
+                        // openFileInput()
+
+                       // fOut = openFileOutput("savedData.txt",  MODE_APPEND);
+                        fOut = new FileOutputStream(new File(handler.getApplicationContext().getFilesDir(), fileName), true); // bought samsung
+                       // fOut = new FileOutputStream(new File( file.getAbsolutePath(),Environment.DIRECTORY_DOWNLOADS+"/time.txt"), true); //teplokram
+
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+
+                        fOut.write((value + "\n").getBytes());
+
+                        System.out.println("###########: !MAYBE SAVED ");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (fOut != null) {
+                            try {
+                                fOut.close();
+                                System.out.println("CLOSEEEEE");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                }
+            }
+        });
+    }
+
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+    /**
+     * Checks if the app has permission to write to device storage
+     *
+     * If the app does not has permission then the user will be prompted to grant permissions
+     *
+     * @param activity
+     */
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
 
 }

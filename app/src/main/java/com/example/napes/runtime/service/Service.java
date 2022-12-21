@@ -21,7 +21,7 @@ import com.example.napes.runtime.service.servers.UdpServer;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Service {
+public class Service extends Thread {
 
      EventService eventService;         //obiekt uruchamiający wątek obsługi zdarzeń
      ServiceFsm serviceFsm;             //obiekt uruchamiający wątek obsługi maszyny stanów
@@ -40,7 +40,11 @@ public class Service {
 
     public  void serviceMain(){         //metoda zaczynająca emulację
 
+
+
         //Ustawienia parametrów oraz uruchamianie innych wątków obsługi
+
+        Config.simulating = true;
 
         Config.ipAddressBroker= component.getMqttBroker().getEndPointDefp().getIP();
         eventService = new EventService(handler);
@@ -70,10 +74,18 @@ public class Service {
         // Start obsługi portów
         servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
 
-       servicePorts.serviceServerPorts();
+        servicePorts.start();
+       //servicePorts.serviceServerPorts();
+        try {
+            System.out.println("Service sleeping");
+            Thread.currentThread().sleep(165_000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
-
+        Config.simulating = false;
+        System.out.println("Changed Config"+ Config.simulating);
     }
 
 

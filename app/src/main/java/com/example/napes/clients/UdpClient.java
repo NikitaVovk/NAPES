@@ -16,6 +16,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 public class UdpClient extends Thread{
@@ -24,15 +25,17 @@ public class UdpClient extends Thread{
     int dstPort;
     private boolean running;
     Flow flow;
+    boolean logLoader;
 
-
+     static boolean payLoader = false;
     DatagramSocket socket;
     InetAddress address;
     MainActivity handler;
 
-    public UdpClient(MainActivity mainActivity) {
+    public UdpClient(MainActivity mainActivity,boolean flag) {
         super();
         handler = mainActivity;
+        this.logLoader = flag;
     }
 
     public void setParams(String message,Flow flow) {
@@ -41,6 +44,7 @@ public class UdpClient extends Thread{
         this.message = message;
         dstPort = Config.udpPort;
         this.flow = flow;
+
 
     }
 
@@ -58,57 +62,106 @@ public class UdpClient extends Thread{
         try {
             socket = new DatagramSocket();
             address = InetAddress.getByName(dstAddress);
+            socket.setSoTimeout(5000);
+
+
 
             System.out.println("SENDING UDP TO :" + address+":"+dstPort);
             // send request
-            byte[] buf = new byte[256];
-            buf = message.getBytes();
+
+            int max =65507;
+            System.out.println("rozmiar pakietu: "+flow.getfParametr());
+            byte[] buf = new byte[max];//flow.getfParametr()];
+            //buf = message.getBytes();
+
+
+
 
             DatagramPacket packet =
                     new DatagramPacket(buf, buf.length, address, dstPort);//dstPort);
 
+           // System.out.println("packetlenght "+packet.getLength());
+           // packet.setLength(600);
             socket.send(packet);
-            String sentTime = (Long.toString(System.currentTimeMillis()));
-            buf = new byte[256];
+            long sentTimel = System.currentTimeMillis();
+            String sentTime = (Long.toString(sentTimel));
+
+
+            //JSON LOGS
+            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"E\",\"cat\":\"sequence_manager\",\"name\":\""+
+                  (payLoader?"k":"k+1")
+                    +"\",\"args\":{}},",handler);
+            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"B\",\"cat\":\"sequence_manager\",\"name\":\""+
+                    (payLoader?"k+1":"k")
+                    +"\",\"args\":{}},",handler);
+
+
+            handler.addLogTime(sentTime,handler,"sentTimes");
+//            handler.addLogTime("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+sentTime+
+//                    ",\"ph\":\"e\",\"cat\":\"service_flows\",\"name\":\""+(payLoader?"k(n+1)":"k(n)")
+//                    +"\",\"id\": 2,\"args\":{}},",handler);
+//            handler.addLogTime("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+sentTime+
+//                    ",\"ph\":\"b\",\"cat\":\"service_flows\",\"name\":\""+(payLoader?"k(n)":"k(n+1)")
+//                    +"\",\"id\": 2,\"args\":{}},",handler);
+
+            payLoader=!payLoader;
+            buf = new byte[flow.getfParametr()];
+            // commented 17.12.22
+
             // get response
             packet = new DatagramPacket(buf, buf.length);
-            socket.receive(packet);
-            String line = new String(packet.getData(), 0, packet.getLength());
 
-            synchronized (handler) {
-                FileOutputStream fOut = null;
-                System.out.println(line);
-                // handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
 
-                System.out.println("############: DIRECTORY:" + handler.getApplicationContext().getFilesDir());
-                try {
-                    // openFileInput()
-                    // fOut = openFileOutput("savedData.txt",  MODE_APPEND);
-                    fOut = new FileOutputStream(new File(handler.getApplicationContext().getFilesDir(), "logs2.txt"), true);
+            try {
+                socket.receive(packet);
 
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+                long rtt = System.currentTimeMillis()- sentTimel;
+                String rttTime = (Long.toString(rtt))+"\t"+Integer.toString(max);  //flow.getfParametr();
 
-                try {
-
-                    fOut.write((sentTime + "\n").getBytes());
-
-                    //System.out.println("###########: !MAYBE SAVED ");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (fOut != null) {
-                        try {
-                            fOut.close();
-                            //System.out.println("CLOSEEEEE");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
+                handler.addLogTime(rttTime,handler,"rttTimes");
+            }catch (SocketTimeoutException e){
+//                System.out.println(e.getCause().getMessage());
             }
+
+          //  String line = new String(packet.getData(), 0, packet.getLength());
+
+
+
+
+//            synchronized (handler) {
+//                FileOutputStream fOut = null;
+//               // System.out.println(line);
+//                // handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
+//
+//                System.out.println("############: DIRECTORY:" + handler.getApplicationContext().getFilesDir());
+//                try {
+//                    // openFileInput()
+//                    // fOut = openFileOutput("savedData.txt",  MODE_APPEND);
+//                    fOut = new FileOutputStream(new File(handler.getApplicationContext().getFilesDir(), "logs.json"), true);
+//
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                try {
+//
+//                    fOut.write((sentTime + "\n").getBytes());
+//
+//                    //System.out.println("###########: !MAYBE SAVED ");
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    if (fOut != null) {
+//                        try {
+//                            fOut.close();
+//                            //System.out.println("CLOSEEEEE");
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//
+//            }
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {

@@ -4,6 +4,7 @@ package com.example.napes.runtime.service.servers;
 import android.graphics.Color;
 
 import com.example.napes.MainActivity;
+import com.example.napes.config.Config;
 import com.example.napes.runtime.service.payload.Colors;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class UdpServer extends Thread {
     @Override
     public void run() {
 
-        while(true){
+        while(true&& Config.simulating){
             try {
                 byte[] buf = new byte[1024];
 
@@ -47,6 +48,10 @@ public class UdpServer extends Thread {
                 realTime = System.currentTimeMillis();
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.receive(packet);
+                String receiveTime = (Long.toString(System.currentTimeMillis()));
+
+              //  handler.addLogTime(receiveTime,handler,"server");
+
 
                 realTime = System.currentTimeMillis() - realTime;
                 System.out.println("REAL TIME UDP :::::::::::::: "+ realTime);
@@ -54,17 +59,18 @@ public class UdpServer extends Thread {
 
                 String dString = "OK "+new Date().toString();
 
-                buf = dString.getBytes();
+              //  buf = dString.getBytes();
 
                 // send the response to the client at "address" and "port"
                 InetAddress address = packet.getAddress();
                 int port = packet.getPort();
-                System.out.println("Request from: " + address + ":" + port);
-                System.out.println("Received data: "+ new String(packet.getData()));
-                handler.setText("UDP/Arrived message:\n@     PAYLOAD     >>>   \n "+ new String(packet.getData())+"\n", Colors.udpColor);
+             //   System.out.println("Request from: " + address + ":" + port);
+               // System.out.println("Received data: "+ new String(packet.getData()));
+              //  handler.setText("UDP/Arrived message:\n@     PAYLOAD     >>>   \n "+ new String(packet.getData())+"\n", Colors.udpColor);
                 //   System.out.println(dString+" "+buf.length);
-                packet = new DatagramPacket(buf, buf.length, address, port);
-                socket.send(packet);
+
+               // packet = new DatagramPacket(buf, buf.length, address, port);
+               socket.send(packet);
 
             } catch (IOException ex) {
                 System.out.println(ex.toString());

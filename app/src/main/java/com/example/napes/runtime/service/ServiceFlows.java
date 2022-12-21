@@ -58,6 +58,10 @@ public class ServiceFlows extends Thread {
 
     @Override
     public void run() {
+        boolean logLoaderUdp = false;
+        String currentFlowBuf = "";
+
+        boolean logLoaderTcp = false;
         //CHECK HASHMAP ::: IF IT CHANGES
         try {
             Thread.sleep(3000);
@@ -66,23 +70,43 @@ public class ServiceFlows extends Thread {
         }
         if (port.getpTransport().equals("U")) {
             System.out.println("MAP IN SERVICE FLOW:"+map);
-while (true){
+while (true&&Config.simulating){
     System.out.println("thru while "+ map.get(stateMachine.getmName()));
             for (StateFlow stateFlow: port.getClientInfo().getStateFlowList().getStateFlows()) {
                 if (map.get(stateMachine.getmName()).equals(stateFlow.getsName())){
-                    while(map.get(stateMachine.getmName()).equals(stateFlow.getsName())) {
+
+                    String currentTime = (Long.toString(System.currentTimeMillis()));
+//                    handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":" + currentTime + ",\"ph\":\"B\",\"cat\":\"service_states\",\"name\":\"" +
+//                            getCurrentFlow(stateFlow).getfType()
+//                            + "\",\"args\":{}},", handler);
+                    handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                            ",\"ph\":\"b\",\"cat\":\"service_flows\",\"name\":\""+getCurrentFlow(stateFlow).getfType()
+                            +"\",\"id\": 2,\"args\":{}},",handler);
+                    while(map.get(stateMachine.getmName()).equals(stateFlow.getsName())&&Config.simulating) {
+
+
+
+
                         Flow currentFlow = getCurrentFlow(stateFlow);
                         long timeOut = currentFlow.getRealTimeDelay();
+                        currentFlowBuf = currentFlow.getfType();
+
 
                         //timeOut*=1000;
 
 
                         //System.out.println("CONFIGURING...");
-                        StaticClients.setUdpClient(new UdpClient(handler));
+                        logLoaderUdp = !logLoaderUdp;
+                        StaticClients.setUdpClient(new UdpClient(handler,logLoaderUdp));
+
                         Config.udpPort = port.getClientInfo().getEndPoint().getPort();
                         Config.ipAddress = port.getClientInfo().getEndPoint().getIP();
                         StaticClients.getUdpClient().setParams("{"+handler.getComponent().getcName()+"} --- {"+stateMachine.getmName()+"} --- {"+
                                 map.get(stateMachine.getmName())+"} --- {"+currentFlow.getfType()+"}",currentFlow);
+
+
+//                        UdpClient udpClient =  new UdpClient(handler,logLoaderUdp);
+//                        udpClient.setParams("mes",currentFlow);
                       //  System.out.println("CONFIGURING22222");
 //                        try {
 //                            Thread.currentThread().sleep(timeOut); //its better to wait (long timeout) and notify when state changes in State fsm
@@ -90,6 +114,7 @@ while (true){
 //                        } catch (InterruptedException e) {
 //                            e.printStackTrace();
 //                        }
+                      //  udpClient.run();
                         StaticClients.getUdpClient().start();
                         synchronized (map){
                             try {
@@ -99,6 +124,13 @@ while (true){
                             }
                         }
                     }
+                    String currentTimeEnd = (Long.toString(System.currentTimeMillis()));
+//                    handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTimeEnd+",\"ph\":\"E\",\"cat\":\"service_states\",\"name\":\""+
+//                            currentFlowBuf
+//                            +"\",\"args\":{}},",handler);
+                    handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTimeEnd+
+                            ",\"ph\":\"e\",\"cat\":\"service_flows\",\"name\":\""+currentFlowBuf
+                            +"\",\"id\": 2,\"args\":{}},",handler);
 
 
                 }
@@ -113,7 +145,7 @@ while (true){
             //System.out.println(" Is CONNECTED : "+tcpClient.isConnected());
 
             System.out.println("MAP IN SERVICE FLOW:"+map);
-            while (true){
+            while (true&&Config.simulating){
 
 //                Config.tcpPort = port.getClientInfo().getEndPoint().getPort();
 //                Config.ipAddressTcp = port.getClientInfo().getEndPoint().getIP();
@@ -124,7 +156,7 @@ while (true){
                 System.out.println("thru while "+ map.get(stateMachine.getmName()));
                 for (StateFlow stateFlow: port.getClientInfo().getStateFlowList().getStateFlows()) {
                     if (map.get(stateMachine.getmName()).equals(stateFlow.getsName())){
-                        while(map.get(stateMachine.getmName()).equals(stateFlow.getsName())) {
+                        while(map.get(stateMachine.getmName()).equals(stateFlow.getsName())&&Config.simulating) {
 
                             realClientTimeTCP= System.currentTimeMillis();
 

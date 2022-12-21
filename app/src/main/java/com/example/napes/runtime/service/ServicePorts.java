@@ -26,6 +26,23 @@ public class ServicePorts extends Service {
         this.serviceStatesArrayList = serviceStatesArrayLis;
     }
 
+
+    @Override
+    public void run() {
+        PortList portList = component.getPortList();
+        System.out.println("PORTLIST!!!!!!!!!!!!!!!!!!!!!!"+portList);
+        for (Port port: portList.getPorts()) {
+            System.out.println("FOR PORTLIST : " +port.getpName());
+            if (port.getpType().equals("s")){
+                startServer(port.getpTransport(), port.getEndPointHere().getPort());
+            }
+            if (port.getpType().equals("c")){
+                //startClient(port.getpTransport(), port.getClientInfo().getEndPoint().getPort(), port.getClientInfo().getEndPoint().getIP());
+                startClient(port);
+            }
+
+        }
+    }
     public void serviceServerPorts(){
 
         PortList portList = component.getPortList();
@@ -47,7 +64,15 @@ public class ServicePorts extends Service {
         for (ServiceStates ss:serviceStatesArrayList) {
             System.out.println("LOOK : "+ss.getStateMachine().getmName()+"  "+ port.getClientInfo().getmName()+" PORT " +port.getpName()+" BOOL "+ ss.getStateMachine().getmName().equals(port.getClientInfo().getmName()));
            if (ss.getStateMachine().getmName().equals(port.getClientInfo().getmName())){
+
                serviceFlows= new ServiceFlows(port,handler,ss.getMap(),ss.getStateMachine(),component.getFlowList());
+
+               String currentTime = (Long.toString(System.currentTimeMillis()));
+
+               handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                       ",\"ph\":\"b\",\"cat\":\"service_flows\",\"name\":\""+"FLOWS"
+                       +"\",\"id\": 2,\"args\":{}},",handler);
+
                serviceFlows.start();
            }
 

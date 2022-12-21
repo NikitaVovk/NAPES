@@ -28,12 +28,21 @@ public class EventService  {
         this.arrivedQueueEvents = new LinkedList<>();
         this.isChanged = false;
 
+        String currentTime = (Long.toString(System.currentTimeMillis()));
+
+        handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
+                ",\"ph\":\"b\",\"cat\":\"service_events\",\"name\":\""+"Event Service"
+                +"\",\"id\": 1,\"args\":{}},",handler);
+
     }
 
     public void startMqttClient(){
         StaticClients.setMqttCallback(new MqttCallbackImpl(handler));
         StaticClients.getMqttCallback().setEventService(this);
         StaticClients.getMqttCallback().setParams();
+    }
+    public boolean disconectFromBroker(){
+     return    StaticClients.getMqttCallback().disConnect();
     }
 
 

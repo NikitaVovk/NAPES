@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Environment;
 
 import com.example.napes.MainActivity;
+import com.example.napes.config.Config;
 import com.example.napes.runtime.service.payload.Colors;
 
 import java.io.File;
@@ -55,7 +56,7 @@ public class TcpServerNIO extends Thread{
        // handler.setText("TCP server started on >> " + listenAddress, Color.RED);
         System.out.println("Server started on >> " + listenAddress);
 
-        while (true) {
+        while (true&& Config.simulating) {
             // wait for events
             int readyCount = selector.select();
             if (readyCount == 0) {

@@ -82,8 +82,10 @@ while (true&&Config.simulating){
                     handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
                             ",\"ph\":\"b\",\"cat\":\"service_flows\",\"name\":\""+getCurrentFlow(stateFlow).getfType()
                             +"\",\"id\": 2,\"args\":{}},",handler);
-                    while(map.get(stateMachine.getmName()).equals(stateFlow.getsName())&&Config.simulating) {
 
+                    StaticClients.setUdpClient(new UdpClient(handler,port));
+                    while(map.get(stateMachine.getmName()).equals(stateFlow.getsName())&&Config.simulating) {
+                        long timer = System.currentTimeMillis();
 
 
 
@@ -94,8 +96,11 @@ while (true&&Config.simulating){
 
                         //timeOut*=1000;
 
+                        logLoaderUdp = !logLoaderUdp;
+                        StaticClients.getUdpClient().setParams("message",currentFlow,logLoaderUdp);
 
                         //System.out.println("CONFIGURING...");
+                        /* 21.12.2022 poprawka
                         logLoaderUdp = !logLoaderUdp;
                         StaticClients.setUdpClient(new UdpClient(handler,logLoaderUdp));
 
@@ -103,7 +108,7 @@ while (true&&Config.simulating){
                         Config.ipAddress = port.getClientInfo().getEndPoint().getIP();
                         StaticClients.getUdpClient().setParams("{"+handler.getComponent().getcName()+"} --- {"+stateMachine.getmName()+"} --- {"+
                                 map.get(stateMachine.getmName())+"} --- {"+currentFlow.getfType()+"}",currentFlow);
-
+*/
 
 //                        UdpClient udpClient =  new UdpClient(handler,logLoaderUdp);
 //                        udpClient.setParams("mes",currentFlow);
@@ -115,15 +120,29 @@ while (true&&Config.simulating){
 //                            e.printStackTrace();
 //                        }
                       //  udpClient.run();
-                        StaticClients.getUdpClient().start();
+
+
+                       // StaticClients.getUdpClient().start();
+                        StaticClients.getUdpClient().sendThroughLink();
+
+
+                        timer = System.currentTimeMillis()-timer;
+
                         synchronized (map){
                             try {
-                                map.wait(timeOut);
+                                if (timer-timeOut>=0){
+                                    map.wait(1);
+                                    continue;}
+                                else{
+                                    System.out.println("Splyu!!!!!!!!!!!"+timer);
+                                map.wait(timeOut-timer);}
+                                System.out.println("Ne splyu!!!!!!!!!!!"+timeOut);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
                         }
                     }
+                    StaticClients.getUdpClient().finalize();
                     String currentTimeEnd = (Long.toString(System.currentTimeMillis()));
 //                    handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTimeEnd+",\"ph\":\"E\",\"cat\":\"service_states\",\"name\":\""+
 //                            currentFlowBuf

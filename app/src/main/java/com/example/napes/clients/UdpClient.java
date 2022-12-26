@@ -6,6 +6,7 @@ import android.os.Message;
 import com.example.napes.MainActivity;
 import com.example.napes.config.Config;
 import com.example.napes.runtime.domains.flows.Flow;
+import com.example.napes.runtime.domains.ports.Port;
 import com.example.napes.runtime.service.payload.Colors;
 
 import java.io.File;
@@ -37,6 +38,17 @@ public class UdpClient extends Thread{
         handler = mainActivity;
         this.logLoader = flag;
     }
+    public UdpClient(MainActivity mainActivity,Port port) {
+        super();
+        handler = mainActivity;
+        dstPort = port.getClientInfo().getEndPoint().getPort();
+        dstAddress = port.getClientInfo().getEndPoint().getIP();
+        try {
+            socket = new DatagramSocket(port.getEndPointHere().getPort());
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void setParams(String message,Flow flow) {
 
@@ -48,21 +60,37 @@ public class UdpClient extends Thread{
 
     }
 
+    public void setParams(String message,Flow flow, boolean logPayloader) {
+
+        this.logLoader = logPayloader;
+
+        try {
+           // socket.setSoTimeout((int) flow.getRealTimeDelay());
+            //for max value
+            socket.setSoTimeout(500);
+
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        this.message = message;
+
+        this.flow = flow;
+
+
+    }
+
+
     public void setRunning(boolean running){
         this.running = running;
     }
 
 
 
-    @Override
-    public void run() {
-
-        running = true;
-
+   synchronized public void sendThroughLink(){
         try {
-            socket = new DatagramSocket();
+           // socket = new DatagramSocket();
             address = InetAddress.getByName(dstAddress);
-            socket.setSoTimeout(5000);
+           // socket.setSoTimeout(5000);
 
 
 
@@ -70,6 +98,7 @@ public class UdpClient extends Thread{
             // send request
 
             int max =65507;
+         //   int max = 32500;
             System.out.println("rozmiar pakietu: "+flow.getfParametr());
             byte[] buf = new byte[max];//flow.getfParametr()];
             //buf = message.getBytes();
@@ -80,8 +109,8 @@ public class UdpClient extends Thread{
             DatagramPacket packet =
                     new DatagramPacket(buf, buf.length, address, dstPort);//dstPort);
 
-           // System.out.println("packetlenght "+packet.getLength());
-           // packet.setLength(600);
+            // System.out.println("packetlenght "+packet.getLength());
+            // packet.setLength(600);
             socket.send(packet);
             long sentTimel = System.currentTimeMillis();
             String sentTime = (Long.toString(sentTimel));
@@ -89,7 +118,7 @@ public class UdpClient extends Thread{
 
             //JSON LOGS
             handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"E\",\"cat\":\"sequence_manager\",\"name\":\""+
-                  (payLoader?"k":"k+1")
+                    (payLoader?"k":"k+1")
                     +"\",\"args\":{}},",handler);
             handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"B\",\"cat\":\"sequence_manager\",\"name\":\""+
                     (payLoader?"k+1":"k")
@@ -116,14 +145,14 @@ public class UdpClient extends Thread{
                 socket.receive(packet);
 
                 long rtt = System.currentTimeMillis()- sentTimel;
-                String rttTime = (Long.toString(rtt))+"\t"+Integer.toString(max);  //flow.getfParametr();
+                String rttTime = sentTimel+"\t"+(Long.toString(rtt))+"\t"+Integer.toString(max);  //flow.getfParametr();
 
                 handler.addLogTime(rttTime,handler,"rttTimes");
             }catch (SocketTimeoutException e){
 //                System.out.println(e.getCause().getMessage());
             }
 
-          //  String line = new String(packet.getData(), 0, packet.getLength());
+            //  String line = new String(packet.getData(), 0, packet.getLength());
 
 
 
@@ -169,11 +198,28 @@ public class UdpClient extends Thread{
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if(socket != null){
-                socket.close();
-               // System.out.println("KONIEEC");
-            }
+
         }
+
+    }
+
+
+
+
+    @Override
+    public void finalize(){
+        if(socket != null){
+            socket.close();
+            // System.out.println("KONIEEC");
+        }
+    }
+
+
+    @Override
+    public void run() {
+
+        running = true;
+        this.sendThroughLink();
 
     }
 }

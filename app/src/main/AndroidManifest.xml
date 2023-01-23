@@ -19,6 +19,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:requestLegacyExternalStorage="true"
+
         android:theme="@style/Theme.NAPES">
         <activity android:name=".SettingActivity">
             <intent-filter>
@@ -27,7 +28,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
+        <profileable android:shell="true"/>
         <activity android:name=".MainActivity"  >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

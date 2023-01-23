@@ -78,14 +78,20 @@ public class Service extends Thread {
        //servicePorts.serviceServerPorts();
         try {
             System.out.println("Service sleeping");
-            Thread.currentThread().sleep(165_000);
+            Thread.currentThread().sleep(225_000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
 
         Config.simulating = false;
-        System.out.println("Changed Config"+ Config.simulating);
+        System.out.println("Changed Config "+ Config.simulating);
+        try {
+            System.out.println("Service sleeping");
+            Thread.currentThread().sleep(5_000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
 

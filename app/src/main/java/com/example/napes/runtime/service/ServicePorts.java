@@ -1,6 +1,7 @@
 package com.example.napes.runtime.service;
 
 import android.graphics.Color;
+import android.os.Process;
 
 import com.example.napes.MainActivity;
 import com.example.napes.clients.StaticClients;
@@ -59,6 +60,10 @@ public class ServicePorts extends Service {
 
         }
     }
+
+
+
+
     private void startClient(Port port) {
         System.out.println("STARTING CLIENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         for (ServiceStates ss:serviceStatesArrayList) {
@@ -72,7 +77,8 @@ public class ServicePorts extends Service {
                handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
                        ",\"ph\":\"b\",\"cat\":\"service_flows\",\"name\":\""+"FLOWS"
                        +"\",\"id\": 2,\"args\":{}},",handler);
-
+              // serviceFlows.setPriority(MAX_PRIORITY);
+               System.out.println("DEFAULT PRIORITY: "+serviceFlows.getPriority());
                serviceFlows.start();
            }
 

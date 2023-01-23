@@ -178,14 +178,20 @@ public class MainActivity extends AppCompatActivity  {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-//                            StaticClients.setUdpClient(new UdpClient(MainActivity.this));
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //                            StaticClients.setUdpClient(new UdpClient(MainActivity.this));
 //                            StaticClients.getUdpClient().setParams("HELLO");
 //                            StaticClients.getUdpClient().start();
-                         service = new Service(component,MainActivity.this);
-                        //service.serviceServerPorts();
+                                service = new Service(component,MainActivity.this);
+                                //service.serviceServerPorts();
 //                        StaticClients.getMqttCallback().setParams();
-                        service.serviceMain();
+                                service.serviceMain();
 
+
+                            }
+                        }).start();
 
                     }
                 }
@@ -451,12 +457,12 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     public  void addLogTime(final String value, MainActivity handler, String fileName){
-
-        runOnUiThread(new Runnable() {
+        new Thread(new Runnable() {
+      //  runOnUiThread(new Runnable() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void run() {
-                synchronized (handler) {
+              //  synchronized (handler) {
                     FileOutputStream fOut = null;
 
                     // handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
@@ -493,9 +499,9 @@ public class MainActivity extends AppCompatActivity  {
                         }
                     }
 
-                }
+            //   }
             }
-        });
+        }).start();
     }
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;

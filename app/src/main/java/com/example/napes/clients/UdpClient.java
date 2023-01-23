@@ -2,6 +2,7 @@ package com.example.napes.clients;
 
 import android.graphics.Color;
 import android.os.Message;
+import android.os.Process;
 
 import com.example.napes.MainActivity;
 import com.example.napes.config.Config;
@@ -19,38 +20,54 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class UdpClient extends Thread{
+public class UdpClient extends Thread {
 
-    String dstAddress,message="";
+    String dstAddress, message = "";
     int dstPort;
     private boolean running;
     Flow flow;
     boolean logLoader;
+    List<String> sentTimeList;
 
-     static boolean payLoader = false;
+    static boolean payLoader = false;
     DatagramSocket socket;
+
     InetAddress address;
     MainActivity handler;
 
-    public UdpClient(MainActivity mainActivity,boolean flag) {
+    public UdpClient(MainActivity mainActivity, boolean flag) {
         super();
+        sentTimeList = new ArrayList<>();
         handler = mainActivity;
         this.logLoader = flag;
     }
-    public UdpClient(MainActivity mainActivity,Port port) {
+
+    public List<String> getSentTimeList() {
+        return sentTimeList;
+    }
+
+    private int dedictPriority(String fName) {
+        return Integer.parseInt(fName.replaceAll("f", ""));
+    }
+
+    public UdpClient(MainActivity mainActivity, Port port) {
         super();
+        sentTimeList = new ArrayList<>();
         handler = mainActivity;
         dstPort = port.getClientInfo().getEndPoint().getPort();
         dstAddress = port.getClientInfo().getEndPoint().getIP();
         try {
             socket = new DatagramSocket(port.getEndPointHere().getPort());
+
         } catch (SocketException e) {
             e.printStackTrace();
         }
     }
 
-    public void setParams(String message,Flow flow) {
+    public void setParams(String message, Flow flow) {
 
         dstAddress = Config.ipAddress;
         this.message = message;
@@ -60,18 +77,18 @@ public class UdpClient extends Thread{
 
     }
 
-    public void setParams(String message,Flow flow, boolean logPayloader) {
+    public void setParams(String message, Flow flow, boolean logPayloader) {
 
         this.logLoader = logPayloader;
 
-        try {
-           // socket.setSoTimeout((int) flow.getRealTimeDelay());
-            //for max value
-            socket.setSoTimeout(500);
-
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
+//        try {
+//           // socket.setSoTimeout((int) flow.getRealTimeDelay());
+//            //for max value
+//            socket.setSoTimeout(500);
+//
+//        } catch (SocketException e) {
+//            e.printStackTrace();
+//        }
         this.message = message;
 
         this.flow = flow;
@@ -80,30 +97,37 @@ public class UdpClient extends Thread{
     }
 
 
-    public void setRunning(boolean running){
+    public void setRunning(boolean running) {
         this.running = running;
     }
 
 
-
-   synchronized public void sendThroughLink(){
+    synchronized public void sendThroughLink() {
         try {
-           // socket = new DatagramSocket();
+            // socket = new DatagramSocket();
             address = InetAddress.getByName(dstAddress);
-           // socket.setSoTimeout(5000);
+            // socket.setSoTimeout(5000);
 
 
-
-            System.out.println("SENDING UDP TO :" + address+":"+dstPort);
+            System.out.println("SENDING UDP TO :" + address + ":" + dstPort);
+            System.out.println("SIZE :" + sentTimeList.size());
+            System.out.println("ANDROID PRIORITY :" + Process.getThreadPriority(Process.myTid()));
+            System.out.println("JAVA PRIORITY :" + Thread.currentThread().getPriority());
             // send request
-
-            int max =65507;
-         //   int max = 32500;
-            System.out.println("rozmiar pakietu: "+flow.getfParametr());
-            byte[] buf = new byte[max];//flow.getfParametr()];
+            //int max = 1;
+            // int max = 256;
+            //int max = 512;
+            // int max = 1024;
+            //int max = 2048;
+            //int max = 4096;
+            // int max = 8192;
+            // int max = 16384;
+            // int max = 32768;
+            // int max =65507;
+            //  int max = 32500;
+            // System.out.println("rozmiar pakietu: "+flow.getfParametr());
+            byte[] buf = new byte[flow.getfParametr()];
             //buf = message.getBytes();
-
-
 
 
             DatagramPacket packet =
@@ -111,21 +135,25 @@ public class UdpClient extends Thread{
 
             // System.out.println("packetlenght "+packet.getLength());
             // packet.setLength(600);
-            socket.send(packet);
-            long sentTimel = System.currentTimeMillis();
-            String sentTime = (Long.toString(sentTimel));
 
+            socket.send(packet);
+            // long sentTimel = System.currentTimeMillis();
+            long sentTimel = System.nanoTime() / 1000;
+            String sentTime = (Long.toString(sentTimel));
+            sentTimeList.add(sentTime);
 
             //JSON LOGS
-            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"E\",\"cat\":\"sequence_manager\",\"name\":\""+
-                    (payLoader?"k":"k+1")
-                    +"\",\"args\":{}},",handler);
-            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"B\",\"cat\":\"sequence_manager\",\"name\":\""+
-                    (payLoader?"k+1":"k")
-                    +"\",\"args\":{}},",handler);
+//            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"E\",\"cat\":\"sequence_manager\",\"name\":\""+
+//                    (payLoader?"k":"k+1")
+//                    +"\",\"args\":{}},",handler);
+//            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"B\",\"cat\":\"sequence_manager\",\"name\":\""+
+//                    (payLoader?"k+1":"k")
+//                    +"\",\"args\":{}},",handler);
+
+            //skomentowano 21_01
+            //   handler.addLogTime(sentTime,handler,Thread.currentThread().getId()+"___"+flow.getfName()+"___"+flow.getRealTimeDelay());
 
 
-            handler.addLogTime(sentTime,handler,"sentTimes");
 //            handler.addLogTime("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+sentTime+
 //                    ",\"ph\":\"e\",\"cat\":\"service_flows\",\"name\":\""+(payLoader?"k(n+1)":"k(n)")
 //                    +"\",\"id\": 2,\"args\":{}},",handler);
@@ -133,11 +161,13 @@ public class UdpClient extends Thread{
 //                    ",\"ph\":\"b\",\"cat\":\"service_flows\",\"name\":\""+(payLoader?"k(n)":"k(n+1)")
 //                    +"\",\"id\": 2,\"args\":{}},",handler);
 
-            payLoader=!payLoader;
-            buf = new byte[flow.getfParametr()];
+            payLoader = !payLoader;
+
+            //   buf = new byte[flow.getfParametr()];
             // commented 17.12.22
 
-            // get response
+ /*26_12_22           // get response
+
             packet = new DatagramPacket(buf, buf.length);
 
 
@@ -151,10 +181,8 @@ public class UdpClient extends Thread{
             }catch (SocketTimeoutException e){
 //                System.out.println(e.getCause().getMessage());
             }
-
+*/
             //  String line = new String(packet.getData(), 0, packet.getLength());
-
-
 
 
 //            synchronized (handler) {
@@ -204,11 +232,9 @@ public class UdpClient extends Thread{
     }
 
 
-
-
     @Override
-    public void finalize(){
-        if(socket != null){
+    public void finalize() {
+        if (socket != null) {
             socket.close();
             // System.out.println("KONIEEC");
         }

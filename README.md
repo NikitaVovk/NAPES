@@ -19,6 +19,23 @@
 </p>
 <p>  The computing power of these devices is increasing and the applications for them are becoming more and more complex. From this arise new problems when designing new applications or when implementing new changes to an already existing IoT network. The system designer should anticipate whether his new solution will not interfere with the operation of the operating system and network. For these purposes, there are many commercial solutions for Unix systems that are supported by IoT devices. One of the most popular solutions is the Iperf network performance measurement and configuration tool.
   As the performance of IoT devices themselves increases, they begin to support higher-level Unix-based systems, such as Android. As of today, there are few solutions on the market analogous to Iperf for Android systems. Therefore, the motivation for this work is to create a tool that would allow you to emulate a real application, while making various measurements that will be used to statistics on the performance of the network and the device itself.</p>
+  
+<h2>Architecture and implementation</h2>
+<br/>
+
+<p>  The basic unit of the NAPES runtime architecture is the component. This component describes the behavior of the state machine and ports running on a node. The implementation of such a system requires the use of multi-threaded programming, because network traffic generation is a different process than the state machine management process. Therefore, the component architecture can be divided into two main layers: the port support layer and the state machine support layer (Fig. 2).</p>
+
+<p align="center">
+
+![image](https://github.com/NikitaVovk/NAPES/assets/37519206/142aa92e-76e2-41e0-8768-59f3e621f162)
+  
+</p>
+<p>  The port handling layer decides what flow generator needs to run based on what state the state machine is in. This layer is designed to validate the flow parameters after each transition between states. The state machine support layer has various states declared within it, but it has only one current state. After starting the emulation, the FSM service layer is supposed to set the current state to the initial state that is declared in the component.
+Each port has rules defined in it, in which each state of the machine can have any flow generator assigned to it. The NAPES component distinguishes two types of events: local and application. Application events are implemented using the MQTT protocol. Sending an MQTT message to a "topic" that is subscribed to by any other component causes it to handle an input event. Local events perform the function of a timer that can only be started after transitioning between states by performing appropriate actions.
+Thanks to this, the components can communicate with each other and react to any changes in the entire NAPES ecosystem. Such an implementation allows you to change the state and generate any network flow. In general, the NAPES system and its components are designed in a way that allows the components to be dynamically created and run on the Android node, allowing for a more true network emulation of the application.
+Just as the system must work on Android systems, the Android Studio development environment was chosen for its development, which contains all the necessary tools to create such applications.
+The following network protocols were used during the system implementation: MQTT, TCP and UDP. Using the MQTT protocol, the system receives information about incoming application events or creates output actions itself. And the TCP and UDP protocols were used to generate heavy network traffic.</p>
+
 
 <h2>Code snippet used when testing the accuracy of sending packets</h2>
 

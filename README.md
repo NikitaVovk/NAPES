@@ -46,7 +46,9 @@
   The purpose of the preliminary test is to check the correct operation of the system, whether the implemented behavior of the system is in line with the expected one. In this experiment, network traffic will be observed from the level of a third-party application and compared with NAPES logs in order to verify the correctness of saving packet times during runtime. In this introductory study, the main features of the emulator will be presented:
   
 • how a state machine works,
+  
 • how the system goes from one state to another
+  
 • and how flows change under different operating conditions.</p>
 
 <p align="center">
@@ -57,9 +59,13 @@
 <p>  The aim of the second part of the research will be to observe the reaction of the system to a change in the parameters of the generated network traffic. Inter-packet time will be taken into account in this test. Based on these time intervals, the basic measures of system accuracy will be calculated:
   
 •	Mean,
+  
 •	Variance,
+  
 •	Standard deviation,
+  
 • Minimum packet spacing,
+  
 • Maximum interpacket spacing.
   
   Having these parameters, it will be possible to conclude how accurate the system is and how different parameters affect the accuracy of network traffic generation on an ordinary IoT device.

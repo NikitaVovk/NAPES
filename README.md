@@ -15,7 +15,7 @@
 
 <p>  IoT devices are subject to a constant revolution, and the number of these devices is growing exponentially. Fig. 1 shows a graph showing how the number of smart devices increased over time. As you can see, in 2020 this number exceeded the value of 50 billion devices that can connect to the network (this is related to the transition to the IPv6 protocol).</p>
 
-<p align="center">
+<p align="centr">
 
 ![image](https://github.com/NikitaVovk/NAPES/assets/37519206/715c9eb3-b6a6-497e-8298-384fa9b58eb0)
   

@@ -12,8 +12,11 @@
 
 <p>  IoT devices are subject to a constant revolution, and the number of these devices is growing exponentially. Fig. 1 shows a graph showing how the number of smart devices increased over time. As you can see, in 2020 this number exceeded the value of 50 billion devices that can connect to the network (this is related to the transition to the IPv6 protocol).</p>
 
-![image](https://github.com/NikitaVovk/NAPES/assets/37519206/715c9eb3-b6a6-497e-8298-384fa9b58eb0)
+<p align="center">
 
+![image](https://github.com/NikitaVovk/NAPES/assets/37519206/715c9eb3-b6a6-497e-8298-384fa9b58eb0)
+  
+</p>
 <p>  The computing power of these devices is increasing and the applications for them are becoming more and more complex. From this arise new problems when designing new applications or when implementing new changes to an already existing IoT network. The system designer should anticipate whether his new solution will not interfere with the operation of the operating system and network. For these purposes, there are many commercial solutions for Unix systems that are supported by IoT devices. One of the most popular solutions is the Iperf network performance measurement and configuration tool.
   As the performance of IoT devices themselves increases, they begin to support higher-level Unix-based systems, such as Android. As of today, there are few solutions on the market analogous to Iperf for Android systems. Therefore, the motivation for this work is to create a tool that would allow you to emulate a real application, while making various measurements that will be used to statistics on the performance of the network and the device itself.</p>
 

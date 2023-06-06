@@ -108,43 +108,7 @@ public class MainActivity extends AppCompatActivity  {
 
         verifyStoragePermissions(this);
 
-        //addLogTime("kyyy",this);
 
-
-
-
-
-//        File file = new File("append.txt");
-//        FileWriter fr = null;
-//
-//        try {
-//            file.createNewFile(); // if file already exists will do nothing
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        //  FileOutputStream oFile = new FileOutputStream(yourFile, false);
-//
-//        try {
-//            System.out.println("###########: !MAYBE SAVED ");
-//            fr = new FileWriter(file, true);
-//            fr.write("data");
-//            fr.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//######################################################################################
-
-
-
-//        try {
-//            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(openFileOutput("logs.txt", Context.MODE_APPEND));
-//            outputStreamWriter.write("data");
-//            outputStreamWriter.close();
-//            System.out.println("######## DONE");
-//        }
-//        catch (IOException e) {
-//            Log.e("Exception", "File write failed: " + e.toString());
-//        }
 
 
 
@@ -172,7 +136,7 @@ public class MainActivity extends AppCompatActivity  {
       //  if (StaticClients.getMqttCallback()==null)
 //        StaticClients.setMqttCallback(new MqttCallbackImpl(this));
 
-        StaticClients.setUdpClient(new UdpClient(this,true));
+       // StaticClients.setUdpClient(new UdpClient(this,true));
 
         startButton.setOnClickListener(
                 new View.OnClickListener() {

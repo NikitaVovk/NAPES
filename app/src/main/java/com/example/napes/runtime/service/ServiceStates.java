@@ -156,61 +156,65 @@ public class ServiceStates extends Thread{
 
                         // while (eventService.getArrivedEventLIST()!=null)
 //                    arrivedEventTemp = new Event(eventService.getArrivedEvent());
-                    for (Transition currentTransition:currentState.getTransitionList().getTransitions()) {
-                        //component.notify();
+
+                        // po przyjściu nowego zdarzenia uruchamia się poniższa pętla,
+                        // która przetwarza wszystkie transakcje dla bieżącego stanu
+                        for (Transition currentTransition : currentState.getTransitionList().getTransitions()) {
+
+                            // poniższa linia sprawdza, czy nowe zdarzenie nie jest zdefiniowane na którymś obiekcie Transactions
+                            // jeśli tak, to znaczy, że został spełniony  warunek na zmianę bieżacego stanu
+                            if (arrivedEventTemp != null && currentTransition.geteName().equals(arrivedEventTemp.geteName())) {
+                                //#########################################################
+                                //do on exit action on currentState  and WITHOUT? transition actions
+
+                                // wykonywanie akcji wyjściowych, jeśli takie zostały zdefiniowane w RCR
+                                sa.doActions(currentState.getOnExit().getActionList());
+
+                                String currentTimeEnd = (Long.toString(System.currentTimeMillis()));
+                                handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":" + currentTimeEnd +
+                                        ",\"ph\":\"e\",\"cat\":\"service_states\",\"name\":\"" + currentState.getsName()
+                                        + "\",\"id\": 1,\"args\":{}},", handler);
+
+                                // zmiana bieżącego stanu na stan zadeklarowany w przetwarzanym obiekcie Transaction
+                                currentState = getStateByName(stateMachine, currentTransition.getsName());
+
+                                String currentTime = (Long.toString(System.currentTimeMillis()));
+                                handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":" + currentTime +
+                                        ",\"ph\":\"b\",\"cat\":\"service_states\",\"name\":\"" + currentState.getsName()
+                                        + "\",\"id\": 1,\"args\":{}},", handler);
 
 
-                        System.out.println("ARRIVED EVENT: "+arrivedEventTemp.geteName()+" == "+currentTransition.geteName());
+                                handler.setText("FSM: " + this.getStateMachine().getmName() + "   <------>   Current state: " + currentState.getsName() + "\n", Colors.stateColor);
+                                // wykonywanie akcji przejściowych zdefiniowanych na przetarzanym Transaction
+                                sa.doActions(currentTransition.getActionList());
+                                System.out.println("HERE 11111111222222 " + currentState.getOnEntry().getActionList());
 
-                        // System.out.println("TRUE OR FALSE : "+currentTransition.geteName().equals(eventService.getArrivedEvent().geteName()));
-                        if (arrivedEventTemp != null && currentTransition.geteName().equals(arrivedEventTemp.geteName())){
-                            //#########################################################
-                            //do on exit action on currentState  and WITHOUT? transition actions
+                                // wykonywanie akcji wejściowych zdefiniowanych na nowym stanie aktualnym
+                                sa.doActions(currentState.getOnEntry().getActionList());
 
-                            //serviceActions = new ServiceActions(component.getEventList());
-                            sa.doActions(currentState.getOnExit().getActionList());
+                                //currentTransition.getActionList();
+                                //currentState.getOnEntry().getActionList()
 
-                            String currentTimeEnd = (Long.toString(System.currentTimeMillis()));
-                            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTimeEnd+
-                                    ",\"ph\":\"e\",\"cat\":\"service_states\",\"name\":\""+currentState.getsName()
-                                    +"\",\"id\": 1,\"args\":{}},",handler);
+                                //do on entry action on currentState  and   transition actions
+                                // zapisywanie do mapy bieżącego stanu na potocznej FSM
+                                map.put(stateMachine.getmName(), currentState.getsName());
+                                synchronized (map) {
+                                    map.notifyAll();
+                                }
 
-                            currentState = getStateByName(stateMachine, currentTransition.getsName());
-
-                            String currentTime = (Long.toString(System.currentTimeMillis()));
-                            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
-                                    ",\"ph\":\"b\",\"cat\":\"service_states\",\"name\":\""+currentState.getsName()
-                                    +"\",\"id\": 1,\"args\":{}},",handler);
-
-
-                            handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state: " + currentState.getsName()+"\n",Colors.stateColor);
-
-                            sa.doActions(currentTransition.getActionList());
-                            System.out.println("HERE 11111111222222 "+currentState.getOnEntry().getActionList());
-                            sa.doActions(currentState.getOnEntry().getActionList());
-
-                            //currentTransition.getActionList();
-                            //currentState.getOnEntry().getActionList()
-
-                            //do on entry action on currentState  and   transition actions
-                            map.put(stateMachine.getmName(),currentState.getsName());
-                            synchronized (map){
-                                map.notifyAll();
                             }
+
+                            //  handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state changed to: " + currentState.getsName()+"\n",Color.rgb(14,63,84));
+
 
                         }
 
-                      //  handler.setText("FSM: "+this.getStateMachine().getmName()+"   <------>   Current state changed to: " + currentState.getsName()+"\n",Color.rgb(14,63,84));
+                        // component.wait();
 
 
+                        System.out.println(map);
+                        // eventService.setArrivedEvent(null);
                     }
-
-                   // component.wait();
-
-
-                System.out.println(map);
-               // eventService.setArrivedEvent(null);
-            }
 
                     isServed = true;
                 synchronized (this){

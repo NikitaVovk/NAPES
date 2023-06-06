@@ -13,15 +13,16 @@ public class EventsParser extends PayLoadParser{
     public EventsParser(LinkedList<String> linkedList) {
         super(linkedList);
     }
-    public EventList parseEventList(){
+
+    public EventList parseEventList() {
         EventList eventList = new EventList();
-        char till='0';
+        char till = '0';
         if (linkedList.get(1).equals("["))
             till = ']';
         else if (linkedList.get(1).equals("{"))
-            till='}';
-        while (!linkedList.getFirst().equals(String.valueOf(till))&&
-                !linkedList.get(1).equals(String.valueOf(till))){
+            till = '}';
+        while (!linkedList.getFirst().equals(String.valueOf(till)) &&
+                !linkedList.get(1).equals(String.valueOf(till))) {
 
             eventList.getEvents().add(parseEvent());
 

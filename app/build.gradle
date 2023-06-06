@@ -5,7 +5,7 @@ plugins {
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
-
+    ndkVersion "25.1.8937393"
     defaultConfig {
         applicationId "com.example.napes"
         minSdkVersion 16

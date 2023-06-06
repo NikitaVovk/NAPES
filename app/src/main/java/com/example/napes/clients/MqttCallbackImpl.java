@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 public class MqttCallbackImpl implements MqttCallback {
-    private static final String TAG = "TAG" ;
+    private static final String TAG = "TAG";
     MainActivity mainActivity;
     MqttClient client;
     EventService eventService;
@@ -42,14 +42,15 @@ public class MqttCallbackImpl implements MqttCallback {
         this.mainActivity = mainActivity;
     }
 
-    public void  setEventService(EventService eventService){
+    public void setEventService(EventService eventService) {
         this.eventService = eventService;
     }
+
     public void setParams() {
-     //   this.mainActivity = mainActivity;
+        //   this.mainActivity = mainActivity;
         try {
-             client = new MqttClient("tcp://"+ Config.ipAddressBroker +":"+Config.mqttPort+"",
-                     MqttAsyncClient.generateClientId(), new MemoryPersistence());
+            client = new MqttClient("tcp://" + Config.ipAddressBroker + ":" + Config.mqttPort
+                    + "", MqttAsyncClient.generateClientId(), new MemoryPersistence());
             MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
 
             mqttConnectOptions.setUserName("12qw34er");
@@ -57,14 +58,15 @@ public class MqttCallbackImpl implements MqttCallback {
 
             client.setCallback(this);
             client.connect(mqttConnectOptions);
-           // String topic = "test/";
-            for (Event event : mainActivity.getComponent().getEventList().getEvents()){
-            if (event.getMqtt_eName()!=null){//&&!event.geteType().equals("o")){
-                System.out.println("SUBBING: "+event.getMqtt_eName() );
-            client.subscribe(event.getMqtt_eName());}
+            // String topic = "test/";
+            for (Event event : mainActivity.getComponent().getEventList().getEvents()) {
+                if (event.getMqtt_eName() != null) {//&&!event.geteType().equals("o")){
+                    System.out.println("SUBBING: " + event.getMqtt_eName());
+                    client.subscribe(event.getMqtt_eName());
+                }
             }
 
-            System.out.println("EVENT SERVICE: "+eventService);
+            System.out.println("EVENT SERVICE: " + eventService);
 
 
             System.out.println("MQTT IS RUNNING");
@@ -86,9 +88,9 @@ public class MqttCallbackImpl implements MqttCallback {
         }
     }
 
-    public void clientPublish(String message){
+    public void clientPublish(String message) {
         try {
-            client.publish(Config.mqttTopic,new MqttMessage(message.getBytes()));
+            client.publish(Config.mqttTopic, new MqttMessage(message.getBytes()));
             mainActivity.setText("MQTT/Message sent!\n", Colors.mqttColor);
         } catch (MqttException e) {
             e.printStackTrace();
@@ -96,40 +98,40 @@ public class MqttCallbackImpl implements MqttCallback {
 
     }
 
+    // przechwytywanie wchodzących wiadomości MQTT
     @Override
-    public  void messageArrived(String topic, MqttMessage message) throws Exception {
+    public void messageArrived(String topic, MqttMessage message) throws Exception {
+        // tekst wiadomości
         String payload = new String(message.getPayload());
-        System.out.println(payload);
-//        while (ServiceStates.isRunning){
-//
-//            System.out.println("isRunning");
-//        }
-        synchronized (eventService){
-            //eventService.setArrivedEvent( ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
-          //  eventService.getArrivedQueueEvents().add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
 
-//            ListIterator<Event> eventListIterator = eventService.getArrivedQueueEvents().listIterator();
-//            eventListIterator.add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
-            eventService.getArrivedQueueEvents().add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(),topic));
+        // blok synchronized w tym przypadku nie pozwala na dodawanie
+        // nowych zdarzeń wielu wątkom jednocześnie
+        synchronized (eventService) {
+            // wyszukiwanie obiektu zdarzenia za nazwą 'topic'
+            // oraz jego umieszczenie do kolejki
+            eventService.getArrivedQueueEvents()
+                    .add(ServiceStates.searchEventByTopic(mainActivity.getComponent().getEventList(), topic));
 
+            // zmiana wartości flagi, która wskazuje o dodaniu nowego zdarzenia do kolejki
             eventService.setChanged(true);
-           // System.out.println("EVENT Arrived:"+ eventService.getArrivedEvent());
-        eventService.notify();
+
+            // powiadomienie o konieczności przetwarzania
+            // dla innych wątków, które znajdują się w stanie oczekującym
+            eventService.notify();
         }
 
 
-
-      //  Config.fos.write(payload.getBytes());
+        //  Config.fos.write(payload.getBytes());
         //textView.append("\n"+payload);
         String currentTime = (Long.toString(System.currentTimeMillis()));
-        String end = (Long.toString(System.currentTimeMillis()+1000L));
-        mainActivity.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTime+
-                ",\"ph\":\"n\",\"cat\":\"service_events\",\"name\":\""+"MQTT: "+topic
-                +"\",\"id\": 1,\"args\":{}},",mainActivity);
+        String end = (Long.toString(System.currentTimeMillis() + 1000L));
+        mainActivity.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":" + currentTime +
+                ",\"ph\":\"n\",\"cat\":\"service_events\",\"name\":\"" + "MQTT: " + topic
+                + "\",\"id\": 1,\"args\":{}},", mainActivity);
 //        mainActivity.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+end+
 //                ",\"ph\":\"e\",\"cat\":\"service_events\",\"name\":\""+"MQTT: "+topic
 //                +"\",\"id\": 1,\"args\":{}},",mainActivity);
-        mainActivity.setText("MQTT message:\n@     Topic   >>>   " + topic +"\n@     Payload   >>>   "+payload+"\n\n",Colors.mqttColor);
+        mainActivity.setText("MQTT message:\n@     Topic   >>>   " + topic + "\n@     Payload   >>>   " + payload + "\n\n", Colors.mqttColor);
         Log.d(TAG, payload);
 
     }
@@ -139,7 +141,6 @@ public class MqttCallbackImpl implements MqttCallback {
         Log.d(TAG, "connectionLost");
         System.out.println(cause);
     }
-
 
 
     @Override

@@ -11,9 +11,9 @@ import java.util.List;
 public class WriteToFileUtil extends Thread{
     private File filesDir;
     private String fileName;
-    private List<String> valueList;
+    private List<Long> valueList;
 
-    public WriteToFileUtil(File filesDir, String fileName, List<String> value) {
+    public WriteToFileUtil(File filesDir, String fileName, List<Long> value) {
         this.filesDir = filesDir;
         this.fileName = fileName;
         this.valueList = value;
@@ -42,9 +42,10 @@ public class WriteToFileUtil extends Thread{
 
         try {
 
-            for (String value:valueList) {
+            for (Long value:valueList) {
                 System.out.println(value);
-                fOut.write((value + "\n").getBytes());
+                value = value/1000;
+                fOut.write((value.toString() + "\n").getBytes());
             }
             System.out.println("###########: !MAYBE SAVED ");
         } catch (IOException e) {

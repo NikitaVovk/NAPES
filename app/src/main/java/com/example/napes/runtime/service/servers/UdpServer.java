@@ -13,6 +13,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class UdpServer extends Thread {
@@ -36,42 +37,29 @@ public class UdpServer extends Thread {
         }
         System.out.println("JavaUdpServer run on: " + serverport);
     }
+    ArrayList<Long> times;
 
     @Override
     public void run() {
-
-        while(true&& Config.simulating){
+        // alokacja pamięci dla przychodzącego pakietu
+        byte[] buf = new byte[1024];
+        DatagramPacket packet = new DatagramPacket(buf, buf.length);
+        while(Config.simulating){
             try {
-                byte[] buf = new byte[1024];
-
-                // receive request
-                realTime = System.currentTimeMillis();
-                DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                // w tym miejscu dziłanie wątku zatrzymuje sie
+                // do póki serwer nie otrzyma pakiet
                 socket.receive(packet);
-                String receiveTime = (Long.toString(System.currentTimeMillis()));
 
-              //  handler.addLogTime(receiveTime,handler,"server");
+                // zapisywanie czasu otrzymania wiadomości do listy
+                times.add(System.currentTimeMillis());
 
-
-                realTime = System.currentTimeMillis() - realTime;
-                System.out.println("REAL TIME UDP :::::::::::::: "+ realTime);
-                realTime = System.currentTimeMillis();
-
-                String dString = "OK "+new Date().toString();
-
-              //  buf = dString.getBytes();
-
-                // send the response to the client at "address" and "port"
+                // uzyskiwanie danych klienta
                 InetAddress address = packet.getAddress();
                 int port = packet.getPort();
-             //   System.out.println("Request from: " + address + ":" + port);
-               // System.out.println("Received data: "+ new String(packet.getData()));
-              //  handler.setText("UDP/Arrived message:\n@     PAYLOAD     >>>   \n "+ new String(packet.getData())+"\n", Colors.udpColor);
-                //   System.out.println(dString+" "+buf.length);
 
-               // packet = new DatagramPacket(buf, buf.length, address, port);
-               socket.send(packet);
-
+                // wyświetlanie informacji
+                System.out.println("Request from: " + address + ":" + port);
+                System.out.println("Received data: "+ new String(packet.getData()));
             } catch (IOException ex) {
                 System.out.println(ex.toString());
             }

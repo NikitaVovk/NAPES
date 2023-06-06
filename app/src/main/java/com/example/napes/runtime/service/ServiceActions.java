@@ -31,7 +31,6 @@ public class ServiceActions {
             System.out.println(event);
             System.out.println("DOING ACTION + "+ action.geteName());
             if (event.geteType().equals("o")){
-                System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOOOWWWWWWWWWWWW");
                 Config.mqttTopic = event.getMqtt_eName();
                 StaticClients.getMqttCallback().clientPublish("test");
                 System.out.println("IVE SENT A MESSAGE AND CONTINUING MY THREAD!!!");

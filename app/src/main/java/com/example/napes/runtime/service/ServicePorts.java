@@ -30,20 +30,20 @@ public class ServicePorts extends Service {
 
     @Override
     public void run() {
+
+        // sprawdzenie każdego portu na jego typ
+        // i w zależności od typu portu uruchamia się odpowiednia obsługa
         PortList portList = component.getPortList();
-        System.out.println("PORTLIST!!!!!!!!!!!!!!!!!!!!!!"+portList);
-        for (Port port: portList.getPorts()) {
-            System.out.println("FOR PORTLIST : " +port.getpName());
-            if (port.getpType().equals("s")){
+        for (Port port : portList.getPorts()) {
+            if (port.getpType().equals("s")) {
                 startServer(port.getpTransport(), port.getEndPointHere().getPort());
             }
-            if (port.getpType().equals("c")){
-                //startClient(port.getpTransport(), port.getClientInfo().getEndPoint().getPort(), port.getClientInfo().getEndPoint().getIP());
+            if (port.getpType().equals("c")) {
                 startClient(port);
             }
-
         }
     }
+
     public void serviceServerPorts(){
 
         PortList portList = component.getPortList();

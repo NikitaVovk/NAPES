@@ -61,19 +61,19 @@ public class ServiceFsm extends Thread {
                 //    while(true){ zmiana 20_12_22
 
 
-
-                        synchronized (eventService){
+            synchronized (eventService) {
 
                 try {
 
 
-                    System.out.println("IS CHANGED ::::::::::"+eventService.isChanged());
-                    if (!eventService.isChanged()){
-                        System.out.println("UnderIfWaiting");
+                    // jeśli lista kolejki zdarzeń nie zmieniła się,
+                    // to system czeka na nowe zdarzenie wejściowe
+                    if (!eventService.isChanged()) {
                         eventService.setArrivedQueueEvents(new LinkedList<>());
                         eventLinkedList = null;
-                    eventService.wait();
 
+                        // semafor, oczekujący na zdarzenie wejściowe
+                        eventService.wait();
                     }
                     if (eventLinkedList==null)
                     eventLinkedList = new LinkedList<>(eventService.getArrivedQueueEvents());

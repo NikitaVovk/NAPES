@@ -1,8 +1,8 @@
 package com.example.napes.clients;
 
+import android.app.NativeActivity;
 import android.graphics.Color;
 import android.os.Message;
-import android.os.Process;
 
 import com.example.napes.MainActivity;
 import com.example.napes.config.Config;
@@ -23,124 +23,92 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UdpClient extends Thread {
+public class UdpClient {
 
+    // Parametry klienta
     String dstAddress, message = "";
     int dstPort;
-    private boolean running;
     Flow flow;
-    boolean logLoader;
-    List<String> sentTimeList;
-
-    static boolean payLoader = false;
-    DatagramSocket socket;
-
     InetAddress address;
-    MainActivity handler;
 
-    public UdpClient(MainActivity mainActivity, boolean flag) {
-        super();
-        sentTimeList = new ArrayList<>();
-        handler = mainActivity;
-        this.logLoader = flag;
-    }
+    List<Long> sentTimeList; // lista czasów wysłanych pakietów
 
-    public List<String> getSentTimeList() {
+
+    DatagramSocket socket; // Obiekt portu
+    DatagramPacket packet; // pakiet
+
+
+    MainActivity handler; // handler dla logów
+
+
+
+    public List<Long> getSentTimeList() {
         return sentTimeList;
-    }
+    } // getter dla listy czasów
 
-    private int dedictPriority(String fName) {
-        return Integer.parseInt(fName.replaceAll("f", ""));
-    }
 
-    public UdpClient(MainActivity mainActivity, Port port) {
-        super();
+
+    // Konstruktor
+    public UdpClient(MainActivity mainActivity, Port port, Flow flow) {
+      //  super();
+        // ustawienia parametrów klienta
         sentTimeList = new ArrayList<>();
         handler = mainActivity;
         dstPort = port.getClientInfo().getEndPoint().getPort();
         dstAddress = port.getClientInfo().getEndPoint().getIP();
-        try {
-            socket = new DatagramSocket(port.getEndPointHere().getPort());
+        this.flow = flow;
 
-        } catch (SocketException e) {
+
+
+        // send request
+       // int max = 1;
+        // int max = 256;
+      //  int max = 512;
+      // int max = 1024;
+        //int max = 2048;
+        //int max = 4096;
+      //   int max = 8192;
+        // int max = 16384;
+        // int max = 32768;
+        // int max =65507;
+        //  int max = 32500;
+        // System.out.println("rozmiar pakietu: "+flow.getfParametr());
+
+        byte[] buf = new byte[flow.getfParametr()]; // alokacja pamięci dla wysyłających pakietów
+
+
+
+        try {
+            address = InetAddress.getByName(dstAddress);
+            packet = new DatagramPacket(buf, buf.length, address, dstPort); // tworzenie pakietu (tutaj podają się paramtry węzła docelowego)
+            socket = new DatagramSocket(port.getEndPointHere().getPort()); // otwarcie podanego portu na komponencie
+
+        } catch (SocketException | UnknownHostException e) {
             e.printStackTrace();
         }
     }
 
-    public void setParams(String message, Flow flow) {
-
-        dstAddress = Config.ipAddress;
-        this.message = message;
-        dstPort = Config.udpPort;
-        this.flow = flow;
 
 
-    }
 
-    public void setParams(String message, Flow flow, boolean logPayloader) {
-
-        this.logLoader = logPayloader;
-
-//        try {
-//           // socket.setSoTimeout((int) flow.getRealTimeDelay());
-//            //for max value
-//            socket.setSoTimeout(500);
-//
-//        } catch (SocketException e) {
-//            e.printStackTrace();
-//        }
-        this.message = message;
-
-        this.flow = flow;
-
-
-    }
-
-
-    public void setRunning(boolean running) {
-        this.running = running;
-    }
 
 
     synchronized public void sendThroughLink() {
         try {
-            // socket = new DatagramSocket();
-            address = InetAddress.getByName(dstAddress);
-            // socket.setSoTimeout(5000);
 
 
-            System.out.println("SENDING UDP TO :" + address + ":" + dstPort);
-            System.out.println("SIZE :" + sentTimeList.size());
-            System.out.println("ANDROID PRIORITY :" + Process.getThreadPriority(Process.myTid()));
-            System.out.println("JAVA PRIORITY :" + Thread.currentThread().getPriority());
-            // send request
-            //int max = 1;
-            // int max = 256;
-            //int max = 512;
-            // int max = 1024;
-            //int max = 2048;
-            //int max = 4096;
-            // int max = 8192;
-            // int max = 16384;
-            // int max = 32768;
-            // int max =65507;
-            //  int max = 32500;
-            // System.out.println("rozmiar pakietu: "+flow.getfParametr());
-            byte[] buf = new byte[flow.getfParametr()];
-            //buf = message.getBytes();
 
 
-            DatagramPacket packet =
-                    new DatagramPacket(buf, buf.length, address, dstPort);//dstPort);
+//            System.out.println("SENDING UDP TO :" + address + ":" + dstPort);
+//            System.out.println("SIZE :" + sentTimeList.size());
+//            System.out.println("ANDROID PRIORITY :" + Process.getThreadPriority(Process.myTid()));
+//            System.out.println("JAVA PRIORITY :" + Thread.currentThread().getPriority());
 
-            // System.out.println("packetlenght "+packet.getLength());
-            // packet.setLength(600);
-
-            socket.send(packet);
+            socket.send(packet); // wysyłanie pakietu
             // long sentTimel = System.currentTimeMillis();
-            long sentTimel = System.nanoTime() / 1000;
-            String sentTime = (Long.toString(sentTimel));
-            sentTimeList.add(sentTime);
+            long sentTimel = System.nanoTime() ; //notacja czasu
+
+            sentTimeList.add(sentTimel); // dodanie czasu do listy
 
             //JSON LOGS
 //            handler.addLog("{\"pid\":\"Node1\",\"tid\":\"packetSend\",\"ts\":"+sentTime+",\"ph\":\"E\",\"cat\":\"sequence_manager\",\"name\":\""+
@@ -154,71 +122,8 @@ public class UdpClient extends Thread {
             //   handler.addLogTime(sentTime,handler,Thread.currentThread().getId()+"___"+flow.getfName()+"___"+flow.getRealTimeDelay());
 
 
-//            handler.addLogTime("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+sentTime+
-//                    ",\"ph\":\"e\",\"cat\":\"service_flows\",\"name\":\""+(payLoader?"k(n+1)":"k(n)")
-//                    +"\",\"id\": 2,\"args\":{}},",handler);
-//            handler.addLogTime("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+sentTime+
-//                    ",\"ph\":\"b\",\"cat\":\"service_flows\",\"name\":\""+(payLoader?"k(n)":"k(n+1)")
-//                    +"\",\"id\": 2,\"args\":{}},",handler);
-
-            payLoader = !payLoader;
-
-            //   buf = new byte[flow.getfParametr()];
-            // commented 17.12.22
-
- /*26_12_22           // get response
-
-            packet = new DatagramPacket(buf, buf.length);
 
 
-            try {
-                socket.receive(packet);
-
-                long rtt = System.currentTimeMillis()- sentTimel;
-                String rttTime = sentTimel+"\t"+(Long.toString(rtt))+"\t"+Integer.toString(max);  //flow.getfParametr();
-
-                handler.addLogTime(rttTime,handler,"rttTimes");
-            }catch (SocketTimeoutException e){
-//                System.out.println(e.getCause().getMessage());
-            }
-*/
-            //  String line = new String(packet.getData(), 0, packet.getLength());
-
-
-//            synchronized (handler) {
-//                FileOutputStream fOut = null;
-//               // System.out.println(line);
-//                // handler.setText("UDP/Sent successfully packet:\n@     Flow     >>>     {"+ this.flow.getfType()+"}\n", Colors.udpColor);
-//
-//                System.out.println("############: DIRECTORY:" + handler.getApplicationContext().getFilesDir());
-//                try {
-//                    // openFileInput()
-//                    // fOut = openFileOutput("savedData.txt",  MODE_APPEND);
-//                    fOut = new FileOutputStream(new File(handler.getApplicationContext().getFilesDir(), "logs.json"), true);
-//
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//
-//                try {
-//
-//                    fOut.write((sentTime + "\n").getBytes());
-//
-//                    //System.out.println("###########: !MAYBE SAVED ");
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    if (fOut != null) {
-//                        try {
-//                            fOut.close();
-//                            //System.out.println("CLOSEEEEE");
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//
-//            }
         } catch (SocketException e) {
             e.printStackTrace();
         } catch (UnknownHostException e) {
@@ -241,11 +146,11 @@ public class UdpClient extends Thread {
     }
 
 
-    @Override
-    public void run() {
-
-        running = true;
-        this.sendThroughLink();
-
-    }
+//    @Override
+//    public void run() {
+//
+//       // running = true;
+//        this.sendThroughLink();
+//
+//    }
 }

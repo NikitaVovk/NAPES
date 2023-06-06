@@ -1,7 +1,6 @@
 package com.example.napes.runtime.service;
 
 import android.os.Process;
-
 import com.example.napes.MainActivity;
 import com.example.napes.clients.StaticClients;
 import com.example.napes.clients.TcpClient;
@@ -16,6 +15,7 @@ import com.example.napes.runtime.domains.statemachine.StateMachine;
 import com.example.napes.runtime.payloads.WriteToFileUtil;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ServiceFlows extends Thread {
 
@@ -27,6 +27,7 @@ public class ServiceFlows extends Thread {
     FlowList flowList;
     long realClientTimeTCP;
 
+    //Konstruktor klasy
     public ServiceFlows(Port port, MainActivity handler, Map<String, String> map, StateMachine stateMachine, FlowList flowList) {
         super("ServiceFlow");
         this.port = port;
@@ -36,6 +37,7 @@ public class ServiceFlows extends Thread {
         this.flowList = flowList;
     }
 
+    // Funkcja pomocnicza zwracająca obiekt typu Flow za jego nazwą
     public Flow findByfName(String fName) {
 
         for (Flow fl : flowList.getFlows()) {
@@ -46,6 +48,7 @@ public class ServiceFlows extends Thread {
     }
 
 
+    // Funkcja zwracająca aktualny stan FSM
     public Flow getCurrentFlow(StateFlow stateFlow) {
         Flow currentFlow = null;
         if (stateFlow.getAnonFlow() == null) {
@@ -57,16 +60,13 @@ public class ServiceFlows extends Thread {
 
     }
 
-    private int dedictPriority(String fName) {
-        return Integer.parseInt(fName.replaceAll("f", ""));
+    private int getPriority(Flow flow) {
+        return Integer.parseInt(flow.getfType());
     }
 
     @Override
     public void run() {
-        //Process.setThreadPriority(Process.THREAD_PRIORITY_URGENT_AUDIO);
 
-
-        // android.os.Process.setThreadPriority(Process.);
         boolean logLoaderUdp = false;
         String currentFlowBuf = "";
         long tempTime;
@@ -77,111 +77,96 @@ public class ServiceFlows extends Thread {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (port.getpTransport().equals("U")) {
-            System.out.println("MAP IN SERVICE FLOW:" + map);
-            while (true && Config.simulating) {
-                System.out.println("thru while " + map.get(stateMachine.getmName()));
-                for (StateFlow stateFlow : port.getClientInfo().getStateFlowList().getStateFlows()) {
-                    if (map.get(stateMachine.getmName()).equals(stateFlow.getsName())) {
 
+
+        if (port.getpTransport().equals("U")) {   // warunek na sprawdzenie typu klienta
+
+
+            while ( Config.simulating) { // do póki flaga symulacji == true
+
+
+                // pętla sprawdzająca każdy state flow
+                for (StateFlow stateFlow : port.getClientInfo().getStateFlowList().getStateFlows()) {
+
+                    // deklaracja parametrów StateFlow
+                    String stateName = stateFlow.getsName();
+                    String stateMachineName = stateMachine.getmName();
+
+                    // sprawdź czy przetwarzany StateFlow  zgadza się z aktualnym stanem FSM
+                    if (map.get(stateMachineName).equals(stateName)) {
+
+                        // zapis czasu rozpoczęcia przepływu do pliku JSON
                         String currentTime = (Long.toString(System.currentTimeMillis()));
-//                    handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":" + currentTime + ",\"ph\":\"B\",\"cat\":\"service_states\",\"name\":\"" +
-//                            getCurrentFlow(stateFlow).getfType()
-//                            + "\",\"args\":{}},", handler);
                         handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":" + currentTime +
                                 ",\"ph\":\"b\",\"cat\":\"service_flows\",\"name\":\"" + getCurrentFlow(stateFlow).getfType()
                                 + "\",\"id\": 2,\"args\":{}},", handler);
 
-                        this.setPriority(dedictPriority(getCurrentFlow(stateFlow).getfName()));
 
-                        UdpClient udpClient = new UdpClient(handler, port);
-                        //StaticClients.setUdpClient(new UdpClient(handler,port));
+
+
+
+                        // ustaw aktualny przepływ na porcie
+                        Flow currentFlow = getCurrentFlow(stateFlow);
+
+                        Thread.currentThread().setName(currentFlow.getfName()+"("+currentFlow.getRealTimeDelay()+" ms, "+currentFlow.getfParametr()+")"); // ustaw nazwę wątku
+                        android.os.Process.setThreadPriority(getPriority(currentFlow)); //ustawienie priorytetu wątków
+                       // android.os.Process.se
+
+                       // android.os.Process.sendSignal(tid, Process.SCHED_FIFO, prio);
+
+                        //tworzenie klienta
+                        UdpClient udpClient = new UdpClient(handler, port,currentFlow);
+
+                        // ustawienie odstępów między pakietami
+                        long timeOut = currentFlow.getRealTimeDelay() * 1_000_000;
+                        currentFlowBuf = currentFlow.getfType();
+
+                        // zapis czasu przed przetwarzaniem
                         long timer = System.nanoTime();
-                        while (map.get(stateMachine.getmName()).equals(stateFlow.getsName()) && Config.simulating) {
+
+                        // pętla przetwarzająca przepływ
+                        while (map.get(stateMachine.getmName()).equals(stateName) && Config.simulating) {
 
 
-                            Flow currentFlow = getCurrentFlow(stateFlow);
-                            long timeOut = currentFlow.getRealTimeDelay() * 1_000_000;
-                            currentFlowBuf = currentFlow.getfType();
-                            //  this.setPriority(dedictPriority(getCurrentFlow(stateFlow).getfName()));
 
-
-                            //timeOut*=1000;
-
-                            logLoaderUdp = !logLoaderUdp;
-
-                            udpClient.setParams("message", currentFlow, logLoaderUdp);
-                            //StaticClients.getUdpClient().setParams("message",currentFlow,logLoaderUdp);
-
-                            //System.out.println("CONFIGURING...");
-                        /* 21.12.2022 poprawka
-                        logLoaderUdp = !logLoaderUdp;
-                        StaticClients.setUdpClient(new UdpClient(handler,logLoaderUdp));
-
-                        Config.udpPort = port.getClientInfo().getEndPoint().getPort();
-                        Config.ipAddress = port.getClientInfo().getEndPoint().getIP();
-                        StaticClients.getUdpClient().setParams("{"+handler.getComponent().getcName()+"} --- {"+stateMachine.getmName()+"} --- {"+
-                                map.get(stateMachine.getmName())+"} --- {"+currentFlow.getfType()+"}",currentFlow);
-*/
-
-//                        UdpClient udpClient =  new UdpClient(handler,logLoaderUdp);
-//                        udpClient.setParams("mes",currentFlow);
-                            //  System.out.println("CONFIGURING22222");
-//                        try {
-//                            Thread.currentThread().sleep(timeOut); //its better to wait (long timeout) and notify when state changes in State fsm
-//                            //object for synchronization will be hashmap which is idential for each fsm
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-                            //  udpClient.run();
-
-
-                            // StaticClients.getUdpClient().start();
-                            udpClient.sendThroughLink();
-                            //   StaticClients.getUdpClient().sendThroughLink();
+                            udpClient.sendThroughLink(); // wysłanie pakietu
 
 
                             tempTime = System.nanoTime() - timer;
 
-                            //     synchronized (map){
-                            // try {
+
+                            // Jeśli czas przetwarzania był większy niż odstęp między pakietami, to kontynuuj pętlę
                             if (tempTime - timeOut >= 0) {
                                 timer = System.nanoTime();
-
-                                // map.wait(1);
                                 continue;
                             } else {
-                                //  System.out.println("Splyu!!!!!!!!!!!"+timer);
-                                timer = System.nanoTime() - timer;
-                                //  System.out.println("TIME TO SLEEP: "+(timeOut-timer));
-//                                    if ((timeOut-timer)<=0)
-//                                        continue;
-//                                    System.out.println("BEEEEEEE "+ timeOut);
-//                                    try {
-//                                        long ttwMs =  (timeOut-timer)/1000_000;
-//                                        int ttwNs =  (int)(timeOut-timer)%1_000_000;
-//                                        // thread to sleep for 1000 milliseconds plus 500 nanoseconds
-//                                        Thread.sleep(ttwMs, ttwNs);
-//                                    } catch (Exception e) {
-//                                        System.out.println(e);
-//                                    }
-                                busySleep(timeOut - timer);
-                                // map.wait(timeOut-timer);
-                                timer = System.nanoTime();//System.currentTimeMillis();
-                            }
-                            //  System.out.println("Ne splyu!!!!!!!!!!!"+timeOut);
 
-                            // }
+                                long timeToSleepNs;
+                                timer = System.nanoTime() - timer; // uwzglednianie czasu przetwarzania
+                                timeToSleepNs = timeOut-timer; // odstęp czasowy - czas przetwarzania
+                               // busySleep(timeOut - timer);
+
+                                try {
+                                    // czekanie
+                                    TimeUnit.NANOSECONDS.sleep(timeToSleepNs);
+                            } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                                // ustaw timer przetwarzania
+                                timer = System.nanoTime();
+                            }
+
+
+
                         }
+                        // zapisz listę czasów do pliku
                         WriteToFileUtil wfUtil = new WriteToFileUtil(handler.getApplicationContext().getFilesDir(),
                                 stateFlow.getfName(), udpClient.getSentTimeList());
                         wfUtil.start();
-                        //  udpClient.finalize();
-                        // StaticClients.getUdpClient().finalize();
+
+                        // log mówiący o końcu przetwarzania danego Flow
                         String currentTimeEnd = (Long.toString(System.currentTimeMillis()));
-//                    handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":"+currentTimeEnd+",\"ph\":\"E\",\"cat\":\"service_states\",\"name\":\""+
-//                            currentFlowBuf
-//                            +"\",\"args\":{}},",handler);
                         handler.addLog("{\"pid\":\"Node1\",\"tid\":\"fsm1\",\"ts\":" + currentTimeEnd +
                                 ",\"ph\":\"e\",\"cat\":\"service_flows\",\"name\":\"" + currentFlowBuf
                                 + "\",\"id\": 2,\"args\":{}},", handler);
@@ -196,15 +181,12 @@ public class ServiceFlows extends Thread {
                     port.getClientInfo().getEndPoint().getPort(), port.getEndPointHere().getPort(), handler);
             tcpClientNIO.connect();
 
-            //System.out.println(" Is CONNECTED : "+tcpClient.isConnected());
+
 
             System.out.println("MAP IN SERVICE FLOW:" + map);
-            while (true && Config.simulating) {
+            while (Config.simulating) {
 
-//                Config.tcpPort = port.getClientInfo().getEndPoint().getPort();
-//                Config.ipAddressTcp = port.getClientInfo().getEndPoint().getIP();
-//                System.out.println("HEREEEEEEE"+Config.ipAddressTcp+Config.tcpPort );
-//                TcpClient tcpClient = new TcpClient(handler);
+
 
 
                 System.out.println("thru while " + map.get(stateMachine.getmName()));
@@ -231,11 +213,6 @@ public class ServiceFlows extends Thread {
                             tcpClientNIO.setParams("{" + handler.getComponent().getcName() + "} --- {" + stateMachine.getmName() + "} --- {" +
                                     map.get(stateMachine.getmName()) + "} --- {" + currentFlow.getfType() + "}", currentFlow);
 
-//                            try {
-//                                Thread.currentThread().sleep(timeOut);
-//                            } catch (InterruptedException e) {
-//                                e.printStackTrace();
-//                            }
 
                             tcpClientNIO.run();
                             synchronized (map) {

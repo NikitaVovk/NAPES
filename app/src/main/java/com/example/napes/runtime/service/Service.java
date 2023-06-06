@@ -15,6 +15,7 @@ import com.example.napes.runtime.domains.statemachine.StateMachine;
 import com.example.napes.runtime.domains.statemachine.StateMachineList;
 import com.example.napes.runtime.domains.statemachine.states.State;
 import com.example.napes.runtime.domains.statemachine.transitions.Transition;
+import com.example.napes.runtime.service.payload.OverLoadCpuUtil;
 import com.example.napes.runtime.service.servers.TcpServer;
 import com.example.napes.runtime.service.servers.UdpServer;
 
@@ -40,16 +41,18 @@ public class Service extends Thread {
 
     public  void serviceMain(){         //metoda zaczynająca emulację
 
-
-
         //Ustawienia parametrów oraz uruchamianie innych wątków obsługi
 
+        // zmiana flagi mówiącej o starcie symulacji
         Config.simulating = true;
 
+        // tworzenie obiektu obsługi zdażeń
+        // oraz łączenia się z brokerem MQTT
         Config.ipAddressBroker= component.getMqttBroker().getEndPointDefp().getIP();
         eventService = new EventService(handler);
-        eventService.startMqttClient(); // Start klienta MQTT
+        eventService.startMqttClient();
 
+        // start wątku obsługującego maszyny stanów
         serviceFsm = new ServiceFsm(eventService,component,handler,component.getStateMachineList());
         serviceFsm.start();             // Start zarządzania maszynami stanów
 
@@ -59,8 +62,10 @@ public class Service extends Thread {
             e.printStackTrace();
         }
 
-        ArrayList<ServiceStates> serviceStatesArrayList =  new ArrayList<>(serviceFsm.
-                getServiceStatesArrayList()); // Pobranie zsynchronizowanych danych
+        // rozmiar tej listy będzie równy ilości maszyn stanów zadeklarowanych w RCR
+        // lista przechowuje obiekty zawierające aktualne informacje o biężących FSM
+        ArrayList<ServiceStates> serviceStatesArrayList =
+                new ArrayList<>(serviceFsm.getServiceStatesArrayList());
 
         //
 //        for (StateMachine stateMachine: component.getStateMachineList().getStateMachines()) {
@@ -75,10 +80,14 @@ public class Service extends Thread {
         servicePorts = new ServicePorts(component,handler,serviceStatesArrayList);
 
         servicePorts.start();
+
+        //OverLoadCpuUtil olcUtil = new OverLoadCpuUtil();
+        //olcUtil.start();
+
        //servicePorts.serviceServerPorts();
         try {
             System.out.println("Service sleeping");
-            Thread.currentThread().sleep(225_000);
+            Thread.currentThread().sleep(35_000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

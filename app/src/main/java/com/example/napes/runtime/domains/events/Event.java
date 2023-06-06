@@ -15,6 +15,7 @@ public class Event {
         this.eType = eType;
         this.mqtt_eName = mqtt_eName;
     }
+
     public Event(Event event) {
         this.eName = event.eName;
         this.eType = event.eType;
@@ -27,6 +28,7 @@ public class Event {
         this.mqtt_eName = mqtt_eName;
         this.timeout = timeout;
     }
+
 
 //    public Event(Event event) {
 //        this.eName = event.eName;

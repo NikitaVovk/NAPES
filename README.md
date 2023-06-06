@@ -5,9 +5,9 @@
 <p>  The scope of work includes the complete implementation of the runtime environment using Java and thorough testing of the emulator in terms of the accuracy of network traffic generation. The research part of the thesis contains the results of the accuracy measurements of network flow generation with various parameters and in various operating conditions of the environment. These accuracy measures were computed from a set of inter-packets times. The results of the measurements showed that the change of parameters has quite a small effect on the accuracy of the system, but some trends are observed. For example, as the amount of data transmitted per unit of time increases, the accuracy of sending network packets decreases. The impact of changing the thread priority in the system on the accuracy of network flow generation was also examined. The results of these studies showed that changing the priority has an ambiguous effect. In some cases, changing the priority improved generation accuracy, but worsened it in others.</p>
 <br/>
 
-<p float="left">
-  <img src="gifs/image22.gif" width="200" />
-  <img src="gifs/image22.gif"  width="200"/>
+<p float="center">
+  <img src="gifs/image22.gif" width="230" />
+  <img src="gifs/image22.gif"  width="230"/>
   </p>
 
 <h2>Motivation</h2>

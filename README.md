@@ -7,7 +7,7 @@
 
 <p float="right">
   <img src="gifs/image22.gif" width="230" />
-  <img src="gifs/image23.gif"  width="230"/>
+  <img src="gifs/image23.gif"  width="260"/>
   </p>
 
 <h2>Motivation</h2>

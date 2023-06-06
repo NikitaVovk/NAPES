@@ -6,6 +6,8 @@
 <br/>
 
 <h2>Code snippet used when testing the accuracy of sending packets</h2>
+
+
 ``` java
 while (Config.simulating) { // do póki flaga symulacji == true
 

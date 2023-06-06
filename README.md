@@ -37,6 +37,34 @@
   Thanks to this, the components can communicate with each other and react to any changes in the entire NAPES ecosystem. Such an implementation allows you to change the state and generate any network flow. In general, the NAPES system and its components are designed in a way that allows the components to be dynamically created and run on the Android node, allowing for a more true network emulation of the application.Just as the system must work on Android systems, the Android Studio development environment was chosen for its development, which contains all the necessary tools to create such applications.
   
   The following network protocols were used during the system implementation: MQTT, TCP and UDP. Using the MQTT protocol, the system receives information about incoming application events or creates output actions itself. And the TCP and UDP protocols were used to generate heavy network traffic.</p>
+  
+  <h2>Tests</h2>
+<br/>
+
+<p>  The research part of this work will be focused on the accuracy of network traffic generation on the NAPES node. The actual time interval between sent packets and how it differs from the expected interval will be observed [7]. The smaller this difference is, the more accurate the system will be. The research part of this work can be divided into three main parts: preliminary tests, tests with different flow parameters and NAPES accuracy tests under different system operating conditions.
+  
+  The purpose of the preliminary test is to check the correct operation of the system, whether the implemented behavior of the system is in line with the expected one. In this experiment, network traffic will be observed from the level of a third-party application and compared with NAPES logs in order to verify the correctness of saving packet times during runtime. In this introductory study, the main features of the emulator will be presented:
+  
+• how a state machine works,
+• how the system goes from one state to another
+• and how flows change under different operating conditions.</p>
+
+<p align="center">
+
+![image](https://github.com/NikitaVovk/NAPES/assets/37519206/be5a357b-0466-4e07-88d8-0b23a190a26c)
+  
+</p>
+<p>  The aim of the second part of the research will be to observe the reaction of the system to a change in the parameters of the generated network traffic. Inter-packet time will be taken into account in this test. Based on these time intervals, the basic measures of system accuracy will be calculated:
+  
+•	Mean,
+•	Variance,
+•	Standard deviation,
+• Minimum packet spacing,
+• Maximum interpacket spacing.
+  
+  Having these parameters, it will be possible to conclude how accurate the system is and how different parameters affect the accuracy of network traffic generation on an ordinary IoT device.
+  
+  NAPES accuracy tests under different system operating conditions - this experiment is designed to investigate the effect of changing the priority of the thread through which the network flow is generated. The Android API has tools that allow you to change thread priorities at the system level.</p>
 
 
 <h2>Code snippet used when testing the accuracy of sending packets</h2>
